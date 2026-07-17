@@ -1610,6 +1610,77 @@
         height: 56px;
       }
     }
+
+    /* ADD TO CART DROPDOWN FOR PICKUP / ON SHOP */
+    .order-type-selector {
+      background: #0f1115;
+      border-radius: 1.2rem;
+      padding: 0.25rem;
+      border: 1px solid rgba(255,255,255,0.06);
+      display: flex;
+      gap: 0.25rem;
+      margin-bottom: 1rem;
+    }
+    .order-type-selector .type-btn {
+      flex: 1;
+      background: transparent;
+      border: none;
+      padding: 0.6rem 0.2rem;
+      border-radius: 1rem;
+      color: #9a9a9f;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      text-align: center;
+    }
+    .order-type-selector .type-btn.active {
+      background: #f4b93e;
+      color: #0a0b0d;
+      box-shadow: 0 0 20px rgba(244,185,62,0.25);
+    }
+    .order-type-selector .type-btn:not(.active):hover {
+      color: #f5f0e6;
+    }
+
+    .table-selector {
+      display: none;
+      margin-top: 0.5rem;
+    }
+    .table-selector.active {
+      display: block;
+    }
+    .table-selector select {
+      width: 100%;
+      padding: 0.7rem 1rem;
+      background: #1c1f24;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 0.75rem;
+      color: #f5f0e6;
+      outline: none;
+      transition: border 0.3s;
+      font-size: 0.9rem;
+      -webkit-appearance: none;
+      appearance: none;
+      cursor: pointer;
+    }
+    .table-selector select:focus { border-color: #f4b93e; }
+    .table-selector select option { background: #141619; color: #f5f0e6; }
+    .table-selector label {
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.05em;
+      color: #b0a99b;
+      display: block;
+      margin-bottom: 0.25rem;
+      text-transform: uppercase;
+    }
+
+    .menu-item-card .order-options {
+      margin-top: 0.75rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
   </style>
 </head>
 <body>
@@ -1760,7 +1831,7 @@
       </div>
       <div class="grid grid-cols-2 gap-4">
         <img src="gallery2/aboutlogo.jpeg" class="rounded-2xl object-cover h-64 w-full lazy-load" alt="cafe interior" loading="lazy">
-        <img src="gallery2/about1.webp" class="rounded-2xl object-cover h-64 w-full mt-8 lazy-load" alt="coffee" loading="lazy">
+        <img src="gallery2/p10.jpg" class="rounded-2xl object-cover h-64 w-full mt-8 lazy-load" alt="coffee" loading="lazy">
       </div>
     </div>
   </section>
@@ -1832,7 +1903,7 @@
     </div>
   </section>
 
-  <!-- MENU (Landing Page - 6 items) -->
+  <!-- MENU (Landing Page - 6 most selling items) -->
   <section id="menu" class="py-24 px-6 sm:px-10 border-t border-brickline brick-texture">
     <div class="max-w-6xl mx-auto">
       <div class="text-center mb-14">
@@ -1947,17 +2018,12 @@
         <div class="bg-char border border-gold/15 rounded-3xl p-6">
           <h3 class="font-display text-xl text-gold mb-3">Hours & Contact</h3>
           <div class="space-y-2 text-sm">
-            <div class="flex justify-between border-b border-cream/10 pb-1"><span class="text-cream/60">Mon – Thu</span><span>9:00 AM – 11:00 PM</span></div>
-            <div class="flex justify-between border-b border-cream/10 pb-1"><span class="text-cream/60">Fri – Sat</span><span>9:00 AM – 11:00 PM</span></div>
-            <div class="flex justify-between"><span class="text-cream/60">Sunday</span><span>9:00 AM – 11:00 PM</span></div>
+            <div class="flex justify-between border-b border-cream/10 pb-1"><span class="text-cream/60">Mon – Fri</span><span>9:00 AM – 11:00 PM</span></div>
+            <div class="flex justify-between border-b border-cream/10 pb-1"><span class="text-cream/60">Sat – Sun</span><span>9:00 AM – 11:00 PM</span></div>
           </div>
           <div class="mt-4 space-y-1 text-sm text-cream/70">
-            <p>📍 Kandy, Sri Lanka</p>
             <p>📞 <a href="tel:+94771216261" class="hover:text-gold transition">+94 (77) 121 62 61</a></p>
             <p>📞 <a href="tel:+94817601699" class="hover:text-gold transition">+94 (81) 760 16 99</a></p>
-            <p>📷 <a href="https://www.instagram.com/blizz_cafe_" target="_blank" class="hover:text-gold transition">@blizz_cafe_</a></p>
-            <p>🎵 <a href="https://www.tiktok.com/@blizz.cafe" target="_blank" class="hover:text-gold transition">@blizz.cafe</a></p>
-            <p>📘 <a href="https://www.facebook.com/theblizzcafe" target="_blank" class="hover:text-gold transition">/theblizzcafe</a></p>
           </div>
         </div>
 
@@ -2002,9 +2068,9 @@
           <div class="slide"><img src="gallery2/p7.webp" alt="gallery" loading="lazy"></div>
           <div class="slide"><img src="gallery2/p8.webp" alt="gallery" loading="lazy"></div>
           <div class="slide"><img src="gallery2/p9.webp" alt="gallery" loading="lazy"></div>
+          <div class="slide"><img src="gallery2/p10.webp" alt="gallery" loading="lazy"></div>
           <div class="slide"><img src="gallery2/p1.webp" alt="gallery" loading="lazy"></div>
-          <div class="slide"><img src="gallery2/p2.webp" alt="gallery" loading="lazy"></div>
-          <div class="slide"><img src="gallery2/p3.webp" alt="gallery" loading="lazy"></div>
+          <div class="slide"><img src="gallery2/p5.webp" alt="gallery" loading="lazy"></div>
         </div>
       </div>
     </div>
@@ -2110,15 +2176,15 @@
         <div id="cartSummary" class="hidden border-t border-cream/10 pt-4 space-y-2">
           <div class="flex justify-between text-sm">
             <span class="text-cream/60">Subtotal</span>
-            <span id="cartSubtotal" class="font-mono text-cream">$0.00</span>
+            <span id="cartSubtotal" class="font-mono text-cream">Rs. 0.00</span>
           </div>
           <div class="flex justify-between text-sm">
-            <span class="text-cream/60">Service Fee (10%)</span>
-            <span id="cartServiceFee" class="font-mono text-cream">$0.00</span>
+            <span class="text-cream/60">Service Fee (5%)</span>
+            <span id="cartServiceFee" class="font-mono text-cream">Rs. 0.00</span>
           </div>
           <div class="flex justify-between text-lg font-semibold pt-2 border-t border-cream/10">
             <span>TOTAL</span>
-            <span id="cartTotal" class="font-mono text-gold">$0.00</span>
+            <span id="cartTotal" class="font-mono text-gold">Rs. 0.00</span>
           </div>
         </div>
         <button id="checkoutBtn" class="hidden w-full bg-gold text-ink font-semibold py-3 rounded-full hover:brightness-110 transition mt-4">Proceed to Order</button>
@@ -2493,17 +2559,17 @@
           if (!shouldApplyDiscount) {
             if (discountBadge) discountBadge.style.display = 'none';
             if (imageBadge) imageBadge.style.display = 'none';
-            priceEl.textContent = `$${parseFloat(priceEl.dataset.originalPrice || priceEl.textContent.replace('$', '')).toFixed(2)}`;
+            priceEl.textContent = `Rs. ${parseFloat(priceEl.dataset.originalPrice || priceEl.textContent.replace('Rs.', '').replace(',', '').trim()).toFixed(0)}`;
             priceEl.style.color = '';
             return;
           }
           
           if (shouldApplyDiscount) {
-            const originalPrice = parseFloat(priceEl.dataset.originalPrice || priceEl.textContent.replace('$', ''));
+            const originalPrice = parseFloat(priceEl.dataset.originalPrice || priceEl.textContent.replace('Rs.', '').replace(',', '').trim());
             if (!isNaN(originalPrice)) {
               const discounted = originalPrice * (1 - discountPct / 100);
               
-              priceEl.textContent = `$${discounted.toFixed(2)}`;
+              priceEl.textContent = `Rs. ${discounted.toFixed(0)}`;
               priceEl.style.color = '#f4b93e';
 
               const imageContainer = card.querySelector('.menu-image-wrap');
@@ -2530,7 +2596,7 @@
       document.querySelectorAll('.menu-item-price').forEach(el => {
         el.style.color = '';
         if (el.dataset.originalPrice) {
-          el.textContent = `$${parseFloat(el.dataset.originalPrice).toFixed(2)}`;
+          el.textContent = `Rs. ${parseFloat(el.dataset.originalPrice).toFixed(0)}`;
         }
       });
       document.querySelectorAll('.discount-badge-image').forEach(el => {
@@ -2661,19 +2727,19 @@
     // ============================================================
     const DAILY_SPECIALS = {
       Sunday: { name: 'Sunday Brick Stack', desc: 'Triple-stacked buttermilk pancakes, burnt-butter maple, seasonal fruit.',
-        price: 'LKR 1900', img: 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?q=80&w=800&auto=format&fit=crop' },
+        price: 'Rs. 1900', img: 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?q=80&w=800&auto=format&fit=crop' },
       Monday: { name: 'Monday Miso Mushroom Toast', desc: 'Charred sourdough, miso-glazed mushrooms, soft egg, chilli oil.',
-        price: 'LKR 1700', img: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?q=80&w=800&auto=format&fit=crop' },
+        price: 'Rs. 1700', img: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?q=80&w=800&auto=format&fit=crop' },
       Tuesday: { name: 'Tuesday Shakshuka', desc: 'Slow-cooked tomato and capsicum, baked eggs, whipped feta, flatbread.',
-        price: 'LKR 1800', img: 'https://images.unsplash.com/photo-1590412200988-a436970781fa?q=80&w=800&auto=format&fit=crop' },
+        price: 'Rs. 1800', img: 'https://images.unsplash.com/photo-1590412200988-a436970781fa?q=80&w=800&auto=format&fit=crop' },
       Wednesday: { name: 'Wednesday Brick Benny', desc: 'Poached eggs, smoked ham hock, hollandaise, toasted brioche.',
-        price: 'LKR 2000', img: 'https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=800&auto=format&fit=crop' },
-      Thursday: { name: 'Thursday Corn Fritters', desc: 'Charred corn, haloumi, avocado smash, chilli jam.', price: 'LKR 1800',
+        price: 'Rs. 2000', img: 'https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=800&auto=format&fit=crop' },
+      Thursday: { name: 'Thursday Corn Fritters', desc: 'Charred corn, haloumi, avocado smash, chilli jam.', price: 'Rs. 1800',
         img: 'https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?q=80&w=800&auto=format&fit=crop' },
-      Friday: { name: 'Friday Big Breakfast', desc: 'Eggs your way, bacon, chorizo, roasted tomato, sourdough.', price: 'LKR 2200',
+      Friday: { name: 'Friday Big Breakfast', desc: 'Eggs your way, bacon, chorizo, roasted tomato, sourdough.', price: 'Rs. 2200',
         img: 'https://images.unsplash.com/photo-1533920379810-6bedac9e31f5?q=80&w=800&auto=format&fit=crop' },
       Saturday: { name: 'Saturday Laneway Fry-Up', desc: 'The full works — eggs, bacon, sausage, beans, mushroom, toast.',
-        price: 'LKR 2400', img: 'https://images.unsplash.com/photo-1533920379810-6bedac9e31f5?q=80&w=800&auto=format&fit=crop' },
+        price: 'Rs. 2400', img: 'https://images.unsplash.com/photo-1533920379810-6bedac9e31f5?q=80&w=800&auto=format&fit=crop' },
     };
 
     let dailySpecialOverrides = {};
@@ -2799,69 +2865,46 @@
     }
 
     // ============================================================
-    // MENU DATA + CAROUSEL (Landing page - 6 items)
+    // MENU DATA + CAROUSEL (Landing page - 6 most selling items)
     // ============================================================
-    const MENU_ITEMS = [{
-      name: 'Avocado Sourdough',
-      price: 10.00,
-      desc: 'Smashed avocado, lemon, chilli flakes, feta.',
-      images: [
-        'gallery2/p1.webp',
-        'gallery2/Brick8.webp',
-        'gallery2/Brick4.webp',
-        'gallery2/Brick5.webp',
-      ]
-    }, {
-      name: 'Blizz Café Benedict',
-      price: 10.00,
-      desc: 'Poached eggs, ham hock, hollandaise, brioche.',
-      images: [
-        'gallery2/Brick10.webp',
-        'gallery2/Brick8.webp',
-        'gallery2/Brick4.webp',
-        'gallery2/Brick5.webp',
-      ]
-    }, {
-      name: 'Black Coffee',
-      price: 10.00,
-      desc: 'Small-batch beans, silky microfoam.',
-      images: [
-        'gallery2/B5.webp',
-        'gallery2/Brick8.webp',
-        'gallery2/Brick4.webp',
-        'gallery2/Brick5.webp',
-      ]
-    }, {
-      name: 'Corn Fritters',
-      price: 10.00,
-      desc: 'Charred corn, haloumi, chilli jam, avo.',
-      images: [
-        'gallery2/B6.webp',
-        'gallery2/Brick8.webp',
-        'gallery2/Brick4.webp',
-        'gallery2/Brick5.webp',
-      ]
-    }, {
-      name: 'Shakshuka',
-      price: 10.00,
-      desc: 'Baked eggs, tomato, capsicum, whipped feta.',
-      images: [
-        'gallery2/B2.webp',
-        'gallery2/Brick8.webp',
-        'gallery2/Brick4.webp',
-        'gallery2/Brick5.webp',
-      ]
-    }, {
-      name: 'Banana Bread',
-      price: 10.00,
-      desc: 'Toasted, salted butter, honey drizzle.',
-      images: [
-        'gallery2/Brick2.webp',
-        'gallery2/Brick2.webp',
-        'gallery2/Brick2.webp',
-        'gallery2/Brick2.webp',
-      ]
-    }, ];
+    const MENU_ITEMS = [
+      {
+        name: 'Chicken Kottu',
+        price: 850,
+        desc: 'Classic Sri Lankan street food — chopped roti with chicken, egg, and veggies.',
+        images: ['gallery2/p1.webp', 'gallery2/Brick8.webp', 'gallery2/Brick4.webp', 'gallery2/Brick5.webp']
+      },
+      {
+        name: 'Sawan (4 Pax)',
+        price: 2700,
+        desc: 'A feast for four — generous portions of our signature dishes.',
+        images: ['gallery2/p2.webp', 'gallery2/Brick8.webp', 'gallery2/Brick4.webp', 'gallery2/Brick5.webp']
+      },
+      {
+        name: 'Nasi Goreng',
+        price: 850,
+        desc: 'Indonesian-style fried rice with chicken, egg, and sambal.',
+        images: ['gallery2/p3.webp', 'gallery2/Brick8.webp', 'gallery2/Brick4.webp', 'gallery2/Brick5.webp']
+      },
+      {
+        name: 'Cheese & Chicken Mongolian Rice',
+        price: 1250,
+        desc: 'Stir-fried rice with tender chicken, cheese, and Mongolian spices.',
+        images: ['gallery2/p4.webp', 'gallery2/Brick8.webp', 'gallery2/Brick4.webp', 'gallery2/Brick5.webp']
+      },
+      {
+        name: 'Zunko Box',
+        price: 900,
+        desc: 'A delightful combo box with rice, curry, and your choice of protein.',
+        images: ['gallery2/p5.webp', 'gallery2/Brick8.webp', 'gallery2/Brick4.webp', 'gallery2/Brick5.webp']
+      },
+      {
+        name: 'Supreme Cheese Kottu',
+        price: 1350,
+        desc: 'The ultimate kottu — loaded with extra cheese, chicken, and spices.',
+        images: ['gallery2/p6.webp', 'gallery2/Brick8.webp', 'gallery2/Brick4.webp', 'gallery2/Brick5.webp']
+      }
+    ];
 
     function renderMenu() {
       const grid = document.getElementById('menuGrid');
@@ -2893,16 +2936,57 @@
                 </div>
               </div>
               <div class="flex justify-between items-start mb-2 mt-1">
-                <span class="font-mono text-gold menu-item-price" data-original-price="${item.price.toFixed(2)}">$${item.price.toFixed(2)}</span>
+                <span class="font-mono text-gold menu-item-price" data-original-price="${item.price.toFixed(0)}">Rs. ${item.price.toFixed(0)}</span>
               </div>
               <p class="text-cream/60 text-sm mb-4">${item.desc}</p>
-              <div class="flex items-center gap-2">
-                <button data-item='${JSON.stringify(item)}' class="add-to-cart flex-1 bg-gold/10 text-gold border border-gold/30 rounded-full py-2 text-sm font-semibold hover:bg-gold hover:text-ink transition">Add to Order</button>
-                <button class="favourite-btn" data-item="${item.name}" aria-label="Add to favourites">♡</button>
+              <div class="flex flex-col gap-2">
+                <div class="flex items-center gap-2">
+                  <button data-item='${JSON.stringify(item)}' class="add-to-cart flex-1 bg-gold/10 text-gold border border-gold/30 rounded-full py-2 text-sm font-semibold hover:bg-gold hover:text-ink transition">Add to Order</button>
+                  <button class="favourite-btn" data-item="${item.name}" aria-label="Add to favourites">♡</button>
+                </div>
+                <div class="order-options">
+                  <div class="order-type-selector">
+                    <button class="type-btn active" data-type="pickup">Pick Up</button>
+                    <button class="type-btn" data-type="onshop">On Shop</button>
+                  </div>
+                  <div class="table-selector" data-type="onshop">
+                    <label for="tableSelect_${itemIndex}">Select Table</label>
+                    <select id="tableSelect_${itemIndex}" class="w-full">
+                      <option value="Table 1">Table 1</option>
+                      <option value="Table 2">Table 2</option>
+                      <option value="Table 3">Table 3</option>
+                      <option value="Table 4">Table 4</option>
+                      <option value="Table 5">Table 5</option>
+                      <option value="Table 6">Table 6</option>
+                      <option value="Table 7">Table 7</option>
+                      <option value="Table 8">Table 8</option>
+                    </select>
+                  </div>
+                </div>
               </div>
             </div>
           `;
         grid.appendChild(card);
+      });
+
+      // Order type selector logic
+      document.querySelectorAll('.order-type-selector').forEach(group => {
+        const btns = group.querySelectorAll('.type-btn');
+        const card = group.closest('.menu-item-card');
+        const tableSelector = card.querySelector('.table-selector');
+        
+        btns.forEach(btn => {
+          btn.addEventListener('click', function() {
+            btns.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            const type = this.dataset.type;
+            if (type === 'onshop') {
+              tableSelector.classList.add('active');
+            } else {
+              tableSelector.classList.remove('active');
+            }
+          });
+        });
       });
 
       document.querySelectorAll('img.lazy-load:not(.loaded)').forEach(img => {
@@ -2924,7 +3008,15 @@
       document.querySelectorAll('.add-to-cart').forEach(btn => {
         btn.addEventListener('click', function() {
           const item = JSON.parse(this.dataset.item);
-          addToCart(item);
+          const card = this.closest('.menu-item-card');
+          const typeBtn = card.querySelector('.type-btn.active');
+          const orderType = typeBtn ? typeBtn.dataset.type : 'pickup';
+          let table = 'Pickup';
+          if (orderType === 'onshop') {
+            const tableSelect = card.querySelector('.table-selector select');
+            table = tableSelect ? tableSelect.value : 'Table 1';
+          }
+          addToCart({ ...item, orderType, table });
         });
       });
 
@@ -2961,13 +3053,17 @@
       if (existing) {
         existing.quantity += 1;
         existing.price = price;
+        existing.orderType = item.orderType || 'pickup';
+        existing.table = item.table || 'Pickup';
       } else {
         cart.push({ 
           name: item.name, 
           price: price,
           quantity: 1, 
           desc: item.desc,
-          originalPrice: item.price
+          originalPrice: item.price,
+          orderType: item.orderType || 'pickup',
+          table: item.table || 'Pickup'
         });
       }
       updateCartUI();
@@ -2997,7 +3093,7 @@
 
     function getCartTotal() {
       const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-      const serviceFee = subtotal * 0.10;
+      const serviceFee = subtotal * 0.05; // 5% service fee
       return { subtotal, serviceFee, total: subtotal + serviceFee };
     }
 
@@ -3032,7 +3128,8 @@
         <div class="cart-item flex items-center gap-3 p-3 rounded-xl bg-char border border-cream/5">
           <div class="flex-1">
             <p class="font-medium text-sm">${item.name}</p>
-            <p class="text-cream/50 text-xs">$${item.price.toFixed(2)}</p>
+            <p class="text-cream/50 text-xs">Rs. ${item.price.toFixed(0)}</p>
+            <p class="text-cream/40 text-xs">${item.orderType === 'onshop' ? 'Table: ' + item.table : 'Pick Up'}</p>
           </div>
           <div class="flex items-center gap-2">
             <button class="quantity-btn" onclick="updateQuantity('${item.name}', -1)">−</button>
@@ -3044,9 +3141,9 @@
       `).join('');
 
       const totals = getCartTotal();
-      document.getElementById('cartSubtotal').textContent = `$${totals.subtotal.toFixed(2)}`;
-      document.getElementById('cartServiceFee').textContent = `$${totals.serviceFee.toFixed(2)}`;
-      document.getElementById('cartTotal').textContent = `$${totals.total.toFixed(2)}`;
+      document.getElementById('cartSubtotal').textContent = `Rs. ${totals.subtotal.toFixed(0)}`;
+      document.getElementById('cartServiceFee').textContent = `Rs. ${totals.serviceFee.toFixed(0)}`;
+      document.getElementById('cartTotal').textContent = `Rs. ${totals.total.toFixed(0)}`;
 
       const totalItems = cart.reduce((sum, i) => sum + i.quantity, 0);
       cartCount.textContent = totalItems;
@@ -3171,7 +3268,9 @@
       const orderItems = cart.map(item => ({
         name: item.name,
         price: item.price,
-        quantity: item.quantity
+        quantity: item.quantity,
+        orderType: item.orderType || 'pickup',
+        table: item.table || 'Pickup'
       }));
 
       const orderId = 'ORD-' + Date.now().toString().slice(-6) + '-' + Math.random().toString(36).substring(2, 6).toUpperCase();
@@ -3207,11 +3306,11 @@
 📍 <b>Branch:</b> ${orderData.branch}
 
 <b>Items:</b>
-${orderItems.map(i => `  • ${i.name} x${i.quantity} = $${(i.price * i.quantity).toFixed(2)}`).join('\n')}
+${orderItems.map(i => `  • ${i.name} x${i.quantity} = Rs. ${(i.price * i.quantity).toFixed(0)} (${i.orderType === 'onshop' ? 'Table: ' + i.table : 'Pick Up'})`).join('\n')}
 
-💰 <b>Subtotal:</b> $${totals.subtotal.toFixed(2)}
-💵 <b>Service Fee (10%):</b> $${totals.serviceFee.toFixed(2)}
-🟡 <b>TOTAL:</b> $${totals.total.toFixed(2)}
+💰 <b>Subtotal:</b> Rs. ${totals.subtotal.toFixed(0)}
+💵 <b>Service Fee (5%):</b> Rs. ${totals.serviceFee.toFixed(0)}
+🟡 <b>TOTAL:</b> Rs. ${totals.total.toFixed(0)}
 
 📦 <b>Type:</b> Pick Up Only
 📍 <b>Address:</b> ${BRANCHES[currentBranchKey].address}
@@ -3235,7 +3334,7 @@ ${orderItems.map(i => `  • ${i.name} x${i.quantity} = $${(i.price * i.quantity
           finishCartAfterOrder();
           showOrderNotification(
             '🎉 Order Confirmed!',
-            `Order #${orderId} placed successfully. Total: $${totals.total.toFixed(2)}. We'll notify you when it's ready.`,
+            `Order #${orderId} placed successfully. Total: Rs. ${totals.total.toFixed(0)}. We'll notify you when it's ready.`,
             '✅',
             true
           );
@@ -3872,11 +3971,10 @@ ${orderItems.map(i => `  • ${i.name} x${i.quantity} = $${(i.price * i.quantity
     setInterval(renderStatus, 1000);
     
     console.log('✅ Blizz Café site initialized!');
-    console.log('✅ Google Sign-In now uses redirect method (more reliable).');
-    console.log('✅ Logo size increased.');
-    console.log('✅ Hero background image fixed with herologo.png.');
-    console.log('✅ Mobile view - background-position: 92% 50% for building focus');
-    console.log('✅ Booking form updated with seating, table, and special request fields.');
+    console.log('✅ 6 most selling items added with updated prices (Rs.)');
+    console.log('✅ Service fee changed to 5%');
+    console.log('✅ Pickup / On Shop selector added with table list for On Shop');
+    console.log('✅ All prices displayed in Rs.');
   </script>
 </body>
 </html>
