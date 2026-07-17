@@ -1564,6 +1564,18 @@
     .seating-selector .seat-btn:not(.active):hover {
       color: #f5f0e6;
     }
+
+    /* Logo larger */
+    .nav-logo {
+      height: 48px;
+      width: auto;
+      object-fit: contain;
+    }
+    @media (min-width: 640px) {
+      .nav-logo {
+        height: 56px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -1572,7 +1584,7 @@
   <header class="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[94%] max-w-6xl">
     <nav class="glass-nav rounded-2xl px-4 sm:px-6 py-3 flex items-center justify-between">
       <a href="index.html" class="flex items-center gap-2 shrink-0">
-        <img src="img/logo.webp" alt="Blizz Café Logo" class="h-8 w-auto sm:h-10 object-contain rounded-md bg-transparent" loading="lazy">
+        <img src="img/logo.webp" alt="Blizz Café Logo" class="nav-logo rounded-md bg-transparent" loading="lazy">
       </a>
 
       <div class="hidden lg:flex items-center gap-8 font-medium text-sm text-cream/80">
@@ -2211,7 +2223,8 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-
+    // Enable Google Auth with popup
+    auth.useDeviceLanguage();
 
     // Telegram Bot Config
     const TELEGRAM_BOT_TOKEN = '8808752785:AAGg2qBtXdsLEPaJNw7z9lDZ6pFhMf1qOew';
@@ -3363,16 +3376,16 @@ ${orderItems.map(i => `  • ${i.name} x${i.quantity} = $${(i.price * i.quantity
     });
 
     // ============================================================
-    // GOOGLE AUTH - FULLY WORKING
+    // GOOGLE AUTH - FIXED - Using redirect instead of popup
     // ============================================================
-    document.getElementById('googleAuthBtn').addEventListener('click', async function(e) {
+    document.getElementById('googleAuthBtn').addEventListener('click', function(e) {
       e.preventDefault();
       
       if (this.disabled) return;
       
       try {
         this.disabled = true;
-        this.innerHTML = '⏳ Signing in...';
+        this.innerHTML = '⏳ Redirecting...';
         
         // Create a Google Auth provider
         const provider = new firebase.auth.GoogleAuthProvider();
@@ -3380,48 +3393,20 @@ ${orderItems.map(i => `  • ${i.name} x${i.quantity} = $${(i.price * i.quantity
           prompt: 'select_account'
         });
         
-        // Sign in with popup
-        const result = await auth.signInWithPopup(provider);
-        const user = result.user;
+        // Use redirect instead of popup - more reliable
+        auth.signInWithRedirect(provider);
         
-        // Store user info in Firestore
-        await db.collection('users').doc(user.uid).set({
-          name: user.displayName || 'Google User',
-          email: user.email,
-          phone: user.phoneNumber || '',
-          photoURL: user.photoURL || '',
-          lastLogin: firebase.firestore.FieldValue.serverTimestamp()
-        }, { merge: true });
-        
-        showOrderNotification(
-          'Welcome!', 
-          `Signed in as ${user.displayName || user.email}`,
-          '👋',
-          true
-        );
-        
-        closeAuthModal();
+        // Note: The redirect will take the user away from the page
+        // The result will be handled in the auth state listener below
         
       } catch (error) {
         console.error('Google Sign-In Error:', error);
-        let errorMessage = 'Google sign-in failed. Please try again.';
-        
-        if (error.code === 'auth/popup-blocked') {
-          errorMessage = 'Popup was blocked. Please allow popups for this site and try again.';
-        } else if (error.code === 'auth/popup-closed-by-user') {
-          errorMessage = 'Sign-in popup was closed before completing.';
-        } else if (error.code === 'auth/cancelled-popup-request') {
-          errorMessage = 'Sign-in request was cancelled.';
-        }
-        
-        showAuthError(errorMessage);
-        showOrderNotification('Sign-in Failed', errorMessage, '❌', false);
-      } finally {
         this.disabled = false;
         this.innerHTML = `
           <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.7-6.1 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.5 6.1 29.5 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.5z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.6 15.6 18.9 13 24 13c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.5 6.1 29.5 4 24 4c-7.4 0-13.8 4.2-17 10.4z"/><path fill="#4CAF50" d="M24 44c5.4 0 10.3-2.1 14-5.5l-6.5-5.5C29.5 34.7 26.9 36 24 36c-5.2 0-9.6-3.3-11.2-8l-6.6 5.1C9.1 39.6 16 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.2 4.2-4.1 5.6l6.5 5.5C40.5 36.6 44 30.8 44 24c0-1.3-.1-2.7-.4-3.5z"/></svg>
           Continue with Google
         `;
+        showAuthError(error.message || 'Google sign-in failed. Please try again.');
       }
     });
 
@@ -3472,7 +3457,7 @@ ${orderItems.map(i => `  • ${i.name} x${i.quantity} = $${(i.price * i.quantity
     });
 
     // ============================================================
-    // AUTH STATE LISTENER
+    // AUTH STATE LISTENER - Handles redirect result too
     // ============================================================
     auth.onAuthStateChanged((user) => {
       currentUser = user;
@@ -3487,6 +3472,18 @@ ${orderItems.map(i => `  • ${i.name} x${i.quantity} = $${(i.price * i.quantity
         updateMobileProfile();
         loadCartFromFirestore();
         loadFavouritesFromFirestore();
+        
+        // Close auth modal if open
+        if (!authOverlay.classList.contains('hidden')) {
+          closeAuthModal();
+        }
+        
+        showOrderNotification(
+          'Welcome!', 
+          `Signed in as ${displayName}`,
+          '👋',
+          true
+        );
       } else {
         icon.classList.remove('hidden');
         initial.classList.add('hidden');
@@ -3494,6 +3491,29 @@ ${orderItems.map(i => `  • ${i.name} x${i.quantity} = $${(i.price * i.quantity
         loadCartFromLocalStorage();
         favourites = [];
         updateFavouriteButtons();
+      }
+    });
+
+    // Handle redirect result for Google Sign-In
+    auth.getRedirectResult().then((result) => {
+      if (result.user) {
+        // User signed in successfully via redirect
+        const user = result.user;
+        db.collection('users').doc(user.uid).set({
+          name: user.displayName || 'Google User',
+          email: user.email,
+          phone: user.phoneNumber || '',
+          photoURL: user.photoURL || '',
+          lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true }).then(() => {
+          console.log('✅ Google user saved to Firestore');
+        }).catch(err => console.error('Error saving Google user:', err));
+      }
+    }).catch((error) => {
+      console.error('Google Redirect Error:', error);
+      // Don't show error if user just closed the popup
+      if (error.code !== 'auth/popup-closed-by-user') {
+        showAuthError(error.message || 'Google sign-in failed. Please try again.');
       }
     });
 
@@ -3795,11 +3815,6 @@ ${orderItems.map(i => `  • ${i.name} x${i.quantity} = $${(i.price * i.quantity
     });
 
     // ============================================================
-    // CHECKOUT & TELEGRAM INTEGRATION
-    // ============================================================
-    // (The checkoutBtn click handler is already defined above with placeOrder)
-
-    // ============================================================
     // INIT
     // ============================================================
     document.getElementById('year').textContent = new Date().getFullYear();
@@ -3824,12 +3839,9 @@ ${orderItems.map(i => `  • ${i.name} x${i.quantity} = $${(i.price * i.quantity
 
     setInterval(renderStatus, 1000);
     
-    console.log('✅ Blizz Café site initialized with LAZY LOADING for all images!');
-    console.log('✅ Images load only when scrolled to.');
-    console.log('✅ Booking date/time validation enabled - past dates/times are locked.');
-    console.log('✅ Order placement fixed - DISCOUNTED price is sent to Telegram AND Firestore!');
-    console.log('✅ Seating selector added: Upstairs / Downstairs');
-    console.log('✅ Google Sign-In is now fully functional!');
+    console.log('✅ Blizz Café site initialized!');
+    console.log('✅ Google Sign-In now uses redirect method (more reliable).');
+    console.log('✅ Logo size increased.');
   </script>
 </body>
 </html>
