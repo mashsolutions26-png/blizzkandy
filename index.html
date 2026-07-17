@@ -259,14 +259,6 @@
       border-color: rgba(244, 185, 62, 0.4);
     }
 
-    .carousel-arrow {
-      transition: all 0.2s ease;
-    }
-    .carousel-arrow:hover {
-      background: rgba(10, 11, 13, 0.85);
-      transform: scale(1.05);
-    }
-
     .special-row {
       display: grid;
       grid-template-columns: 34px 1fr auto;
@@ -2872,37 +2864,37 @@
         name: 'Chicken Kottu',
         price: 850,
         desc: 'Classic Sri Lankan street food — chopped roti with chicken, egg, and veggies.',
-        images: ['gallery2/p1.webp']
+        image: 'gallery2/p1.webp'
       },
       {
         name: 'Sawan (4 Pax)',
         price: 2700,
         desc: 'A feast for four — generous portions of our signature dishes.',
-        images: ['gallery2/p2.webp']
+        image: 'gallery2/p2.webp'
       },
       {
         name: 'Nasi Goreng',
         price: 850,
         desc: 'Indonesian-style fried rice with chicken, egg, and sambal.',
-        images: ['gallery2/p3.webp']
+        image: 'gallery2/p3.webp'
       },
       {
         name: 'Cheese & Chicken Mongolian Rice',
         price: 1250,
         desc: 'Stir-fried rice with tender chicken, cheese, and Mongolian spices.',
-        images: ['gallery2/p4.webp']
+        image: 'gallery2/p4.webp'
       },
       {
         name: 'Zunko Box',
         price: 900,
         desc: 'A delightful combo box with rice, curry, and your choice of protein.',
-        images: ['gallery2/p5.webp']
+        image: 'gallery2/p5.webp'
       },
       {
         name: 'Supreme Cheese Kottu',
         price: 1350,
         desc: 'The ultimate kottu — loaded with extra cheese, chicken, and spices.',
-        images: ['gallery2/p6.webp']
+        image: 'gallery2/p6.webp'
       }
     ];
 
@@ -2915,19 +2907,9 @@
         card.dataset.itemName = item.name;
         card.innerHTML = `
             <div class="relative menu-image-wrap">
-              <div id="carousel-${itemIndex}" class="flex overflow-x-auto no-scrollbar snap-x-cards">
-                ${item.images.map(src => `
-                  <div class="snap-card shrink-0 w-full h-56">
-                    <img src="${src}" class="w-full h-full object-cover lazy-load" alt="${item.name}" loading="lazy">
-                  </div>
-                `).join('')}
+              <div class="w-full h-56">
+                <img src="${item.image}" class="w-full h-full object-cover lazy-load" alt="${item.name}" loading="lazy">
               </div>
-              <button data-dir="-1" data-target="${itemIndex}" class="carousel-arrow absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-ink/60 backdrop-blur flex items-center justify-center hover:bg-ink/90 transition">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f5f0e6" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>
-              </button>
-              <button data-dir="1" data-target="${itemIndex}" class="carousel-arrow absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-ink/60 backdrop-blur flex items-center justify-center hover:bg-ink/90 transition">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f5f0e6" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
-              </button>
             </div>
             <div class="p-5">
               <div class="menu-item-header">
@@ -2995,14 +2977,6 @@
         if (rect.top < winHeight + 200) {
           img.classList.add('loaded');
         }
-      });
-
-      document.querySelectorAll('.carousel-arrow').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const track = document.getElementById(`carousel-${btn.dataset.target}`);
-          const cardWidth = track.firstElementChild.offsetWidth;
-          track.scrollBy({ left: cardWidth * Number(btn.dataset.dir), behavior: 'smooth' });
-        });
       });
 
       document.querySelectorAll('.add-to-cart').forEach(btn => {
@@ -3975,6 +3949,7 @@ ${orderItems.map(i => `  • ${i.name} x${i.quantity} = Rs. ${(i.price * i.quant
     console.log('✅ Service fee changed to 5%');
     console.log('✅ Pickup / On Shop selector added with table list for On Shop');
     console.log('✅ All prices displayed in Rs.');
+    console.log('✅ Removed image carousels from menu items and replaced with single static images.');
   </script>
 </body>
 </html>
