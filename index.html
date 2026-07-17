@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Blizz Café</title>
   <meta name="description" content="Blizz Café — a cozy café in Kandy, Sri Lanka. Book a table, browse the menu, and check today's hours." />
-  <link rel="icon" type="image/png" sizes="32x32" href="gallery2/logo.png" />
-  <link rel="icon" type="image/png" sizes="16x16" href="gallery2/logo.png" />
-  <link rel="apple-touch-icon" href="gallery2/logo.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="img/logo.webp" />
+  <link rel="icon" type="image/png" sizes="16x16" href="img/logo.webp" />
+  <link rel="apple-touch-icon" href="img/logo.webp" />
 
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-H5RMLCQD7W"></script>
@@ -148,24 +148,34 @@
     .hero-bg {
       background-color: var(--ink);
       background-size: cover;
-      background-position: center 30%;
+      background-position: right center;
       background-repeat: no-repeat;
+      background-image: url('img/');
     }
-    
+
     .hero-overlay {
       background: linear-gradient(
-        115deg, 
-        rgba(10, 11, 13, 0.95) 15%, 
-        rgba(10, 11, 13, 0.5) 45%, 
-        rgba(10, 11, 13, 0.1) 75%, 
-        rgba(10, 11, 13, 0.05) 100%
+        115deg,
+        rgba(10, 11, 13, 0.95) 15%,
+        rgba(10, 11, 13, 0.5) 45%,
+        rgba(10, 11, 13, 0.1) 75%,
+        rgba(10, 11, 13, 0) 100%
       );
     }
 
     @media (max-width: 768px) {
-      .hero-bg { background-position: 40% 20%; }
+      .hero-bg {
+        background-size: contain;
+        background-position: top center;
+        background-repeat: no-repeat;
+      }
       .hero-overlay {
-        background: linear-gradient(135deg, rgba(10, 11, 13, 0.95) 0%, rgba(10, 11, 13, 0.8) 50%, rgba(10, 11, 13, 0.4) 100%);
+        background: linear-gradient(
+          to bottom,
+          rgba(10, 11, 13, 0.35) 0%,
+          rgba(10, 11, 13, 0.75) 55%,
+          rgba(10, 11, 13, 0.95) 100%
+        );
       }
     }
 
@@ -254,7 +264,7 @@
 
     .booking-extra-row {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr 1fr 1fr;
       gap: 1rem;
       margin-top: 0.5rem;
     }
@@ -293,6 +303,9 @@
       color: #b0a99b;
       pointer-events: none;
       font-size: 0.8rem;
+    }
+    @media (max-width: 768px) {
+      .booking-extra-row { grid-template-columns: 1fr 1fr; }
     }
     @media (max-width: 480px) {
       .booking-extra-row { grid-template-columns: 1fr; gap: 0.75rem; }
@@ -1505,12 +1518,6 @@
     img.lazy-load.loaded {
       opacity: 1;
     }
-    .hero-bg.lazy-bg {
-      background-image: none !important;
-    }
-    .hero-bg.loaded {
-      background-image: url('gallery2/Brick8.webp');
-    }
 
     .booking-error {
       background: rgba(200, 16, 46, 0.12);
@@ -1667,7 +1674,7 @@
   </div>
 
   <!-- HERO -->
-  <section id="home" class="relative min-h-screen flex items-center overflow-hidden hero-bg lazy-bg" data-bg="gallery2/Brick8.webp">
+  <section id="home" class="relative min-h-screen flex items-center overflow-hidden hero-bg">
     <div class="absolute inset-0 hero-overlay"></div>
     <div class="absolute inset-0 brick-texture opacity-20"></div>
 
@@ -1725,7 +1732,7 @@
         <p class="text-cream/70 leading-relaxed">We roast in small batches, bake daily, and keep the menu tight so everything on it is done properly. Come early, the good tables go fast.</p>
       </div>
       <div class="grid grid-cols-2 gap-4">
-        <img src="gallery2/about1.webp" class="rounded-2xl object-cover h-64 w-full lazy-load" alt="cafe interior" loading="lazy">
+        <img src="gallery2/aboutlogo.jpeg" class="rounded-2xl object-cover h-64 w-full lazy-load" alt="cafe interior" loading="lazy">
         <img src="gallery2/about1.webp" class="rounded-2xl object-cover h-64 w-full mt-8 lazy-load" alt="coffee" loading="lazy">
       </div>
     </div>
@@ -1776,7 +1783,7 @@
   <section id="discountSpecial" class="discount-special-section border-t border-brickline">
     <div class="discount-special-grid" id="discountSpecialGrid">
       <div class="image-side">
-        <img id="discountSpecialImg" src="gallery2/Brick8.webp" alt="discount dish" class="rounded-[2rem] lazy-load" loading="lazy">
+        <img id="discountSpecialImg" src="img/herologo.jpeg" alt="discount dish" class="rounded-[2rem] lazy-load" loading="lazy">
       </div>
       <div class="details-side">
         <span class="badge-tag">🔥 Limited Offer</span>
@@ -1819,7 +1826,7 @@
     </div>
   </section>
 
-  <!-- BOOK A TABLE -->
+  <!-- BOOK A TABLE — UPDATED with new fields and layout -->
   <section id="book" class="py-24 px-6 sm:px-10 border-t border-brickline">
     <div class="max-w-6xl mx-auto text-center mb-10">
       <span class="text-xs tracking-[0.25em] uppercase text-gold/80">Reservations</span>
@@ -1846,14 +1853,6 @@
         <input required type="date" id="bookingDate" class="bg-ink border border-cream/15 rounded-xl px-4 py-3 text-sm focus:border-gold/60">
         <input required type="time" id="bookingTime" class="bg-ink border border-cream/15 rounded-xl px-4 py-3 text-sm focus:border-gold/60">
         
-        <!-- SEATING SELECTOR -->
-        <div class="sm:col-span-2">
-          <div class="seating-selector" id="seatingSelector">
-            <button type="button" class="seat-btn" data-seat="Upstairs">⬆ Upstairs</button>
-            <button type="button" class="seat-btn" data-seat="Downstairs">⬇ Downstairs</button>
-          </div>
-          <input type="hidden" id="seatingPreference" value="Upstairs">
-        </div>
 
         <div class="relative sm:col-span-2">
           <select id="guestsSelect" class="w-full bg-ink border border-cream/15 rounded-xl px-4 py-3 text-sm focus:border-gold/60 appearance-none">
@@ -1874,7 +1873,29 @@
           </div>
         </div>
 
+        <!-- New extra fields: seating, table, special requests -->
         <div class="booking-extra-row sm:col-span-2">
+          <div class="select-wrapper">
+            <label for="bookingSeating">Where would you like to be seated?</label>
+            <select id="bookingSeating" class="w-full">
+              <option value="Upstairs">Upstairs</option>
+              <option value="Downstairs">Downstairs</option>
+            </select>
+          </div>
+          <div class="select-wrapper">
+            <label for="bookingTable">Which table would you like?</label>
+            <select id="bookingTable" class="w-full">
+              <option value="">— Any Table —</option>
+              <option value="Table 1">Table 1</option>
+              <option value="Table 2">Table 2</option>
+              <option value="Table 3">Table 3</option>
+              <option value="Table 4">Table 4</option>
+              <option value="Table 5">Table 5</option>
+              <option value="Table 6">Table 6</option>
+              <option value="Table 7">Table 7</option>
+              <option value="Table 8">Table 8</option>
+            </select>
+          </div>
           <div class="select-wrapper">
             <label for="bookingSpecialRequests">Special Requests (optional)</label>
             <select id="bookingSpecialRequests" class="w-full">
@@ -2146,25 +2167,9 @@
   <!-- JAVASCRIPT -->
   <script>
     // ============================================================
-    // LAZY LOAD: Intersection Observer + Hero Background
+    // LAZY LOAD: Intersection Observer
     // ============================================================
     (function lazyLoadImages() {
-      const hero = document.querySelector('.hero-bg');
-      if (hero && hero.dataset.bg) {
-        const img = new Image();
-        img.src = hero.dataset.bg;
-        img.onload = function() {
-          hero.style.backgroundImage = `url('${hero.dataset.bg}')`;
-          hero.classList.remove('lazy-bg');
-          hero.classList.add('loaded');
-        };
-        if (img.complete) {
-          hero.style.backgroundImage = `url('${hero.dataset.bg}')`;
-          hero.classList.remove('lazy-bg');
-          hero.classList.add('loaded');
-        }
-      }
-
       const lazyImages = document.querySelectorAll('img.lazy-load');
       if ('IntersectionObserver' in window) {
         const observer = new IntersectionObserver((entries) => {
@@ -2208,7 +2213,7 @@
     })();
 
     // ============================================================
-    // FIREBASE INITIALISATION - UPDATED with your config
+    // FIREBASE INITIALISATION
     // ============================================================
     const firebaseConfig = {
       apiKey: "AIzaSyB_UdWrxjbuhPiFBSOZGo_mGIIdalUZbx8",
@@ -2223,7 +2228,6 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    // Enable Google Auth with popup
     auth.useDeviceLanguage();
 
     // Telegram Bot Config
@@ -2776,7 +2780,7 @@
       price: 10.00,
       desc: 'Smashed avocado, lemon, chilli flakes, feta.',
       images: [
-        'gallery2/p1',
+        'gallery2/p1.webp',
         'gallery2/Brick8.webp',
         'gallery2/Brick4.webp',
         'gallery2/Brick5.webp',
@@ -3075,6 +3079,7 @@
 🕐 Time: ${bookingData.time}
 👥 Guests: ${bookingData.guests}
 🪑 Seating: ${bookingData.seating || 'Not specified'}
+🍽️ Table: ${bookingData.table || 'Any'}
 📝 Special Request: ${bookingData.specialRequest || 'None'}
 📋 Additional Requests: ${bookingData.additionalRequests || 'None'}
 🆔 Booking ID: ${bookingData.bookingId}
@@ -3376,7 +3381,7 @@ ${orderItems.map(i => `  • ${i.name} x${i.quantity} = $${(i.price * i.quantity
     });
 
     // ============================================================
-    // GOOGLE AUTH - FIXED - Using redirect instead of popup
+    // GOOGLE AUTH - Using redirect
     // ============================================================
     document.getElementById('googleAuthBtn').addEventListener('click', function(e) {
       e.preventDefault();
@@ -3387,17 +3392,12 @@ ${orderItems.map(i => `  • ${i.name} x${i.quantity} = $${(i.price * i.quantity
         this.disabled = true;
         this.innerHTML = '⏳ Redirecting...';
         
-        // Create a Google Auth provider
         const provider = new firebase.auth.GoogleAuthProvider();
         provider.setCustomParameters({
           prompt: 'select_account'
         });
         
-        // Use redirect instead of popup - more reliable
         auth.signInWithRedirect(provider);
-        
-        // Note: The redirect will take the user away from the page
-        // The result will be handled in the auth state listener below
         
       } catch (error) {
         console.error('Google Sign-In Error:', error);
@@ -3457,7 +3457,7 @@ ${orderItems.map(i => `  • ${i.name} x${i.quantity} = $${(i.price * i.quantity
     });
 
     // ============================================================
-    // AUTH STATE LISTENER - Handles redirect result too
+    // AUTH STATE LISTENER
     // ============================================================
     auth.onAuthStateChanged((user) => {
       currentUser = user;
@@ -3473,7 +3473,6 @@ ${orderItems.map(i => `  • ${i.name} x${i.quantity} = $${(i.price * i.quantity
         loadCartFromFirestore();
         loadFavouritesFromFirestore();
         
-        // Close auth modal if open
         if (!authOverlay.classList.contains('hidden')) {
           closeAuthModal();
         }
@@ -3497,7 +3496,6 @@ ${orderItems.map(i => `  • ${i.name} x${i.quantity} = $${(i.price * i.quantity
     // Handle redirect result for Google Sign-In
     auth.getRedirectResult().then((result) => {
       if (result.user) {
-        // User signed in successfully via redirect
         const user = result.user;
         db.collection('users').doc(user.uid).set({
           name: user.displayName || 'Google User',
@@ -3511,7 +3509,6 @@ ${orderItems.map(i => `  • ${i.name} x${i.quantity} = $${(i.price * i.quantity
       }
     }).catch((error) => {
       console.error('Google Redirect Error:', error);
-      // Don't show error if user just closed the popup
       if (error.code !== 'auth/popup-closed-by-user') {
         showAuthError(error.message || 'Google sign-in failed. Please try again.');
       }
@@ -3684,7 +3681,6 @@ ${orderItems.map(i => `  • ${i.name} x${i.quantity} = $${(i.price * i.quantity
           seatingHidden.value = this.dataset.seat;
         });
       });
-      // Set default active
       document.querySelector('.seat-btn[data-seat="Upstairs"]').classList.add('active');
       seatingHidden.value = 'Upstairs';
 
@@ -3692,7 +3688,7 @@ ${orderItems.map(i => `  • ${i.name} x${i.quantity} = $${(i.price * i.quantity
     }
 
     // ============================================================
-    // BOOKING FORM SUBMIT (with validation + seating)
+    // BOOKING FORM SUBMIT (updated with new fields)
     // ============================================================
     const guestsSelect = document.getElementById('guestsSelect');
     const customGuestsWrapper = document.getElementById('customGuestsWrapper');
@@ -3749,8 +3745,13 @@ ${orderItems.map(i => `  • ${i.name} x${i.quantity} = $${(i.price * i.quantity
         const customVal = customGuestsInput.value.trim();
         guestsValue = customVal ? `${customVal} Guests` : '2 Guests';
       }
-      const specialRequest = form.querySelector('#bookingSpecialRequests').value || 'None';
+      
+      // New fields
+      const seating = document.getElementById('bookingSeating').value || 'Not specified';
+      const table = document.getElementById('bookingTable').value || 'Any';
+      const specialRequest = document.getElementById('bookingSpecialRequests').value || 'None';
       const additionalRequests = form.querySelector('textarea').value || 'None';
+      
       const bookingId = 'BK-' + Date.now().toString().slice(-6);
       const createdAt = new Date().toLocaleString('en-LK', {
         timeZone: 'Asia/Colombo',
@@ -3764,19 +3765,20 @@ ${orderItems.map(i => `  • ${i.name} x${i.quantity} = $${(i.price * i.quantity
       const userEmail = currentUser ? currentUser.email : 'guest@example.com';
       const userName = currentUser ? (currentUser.displayName || currentUser.email || 'Guest') : name;
       const uid = currentUser ? currentUser.uid : 'guest';
-      const seating = document.getElementById('seatingPreference').value || 'Not specified';
+      const seatingPreference = document.getElementById('seatingPreference').value || 'Not specified';
 
       const bookingData = {
         name, phone, date: dateInput.value, time: timeInput.value, guests: guestsValue,
-        specialRequest, additionalRequests, bookingId, guestType: currentUser ? 'Logged In User' : 'Guest',
-        createdAt, userEmail, userName, seating
+        seating, table, specialRequest, additionalRequests, bookingId,
+        guestType: currentUser ? 'Logged In User' : 'Guest',
+        createdAt, userEmail, userName, seatingPreference
       };
 
       db.collection('bookings').add({
         uid, name, email: userEmail, phone, date: dateInput.value, time: timeInput.value,
-        guests: guestsValue, specialRequest, additionalRequests, bookingId,
+        guests: guestsValue, seating, table, specialRequest, additionalRequests, bookingId,
         branch: currentBranchKey, guestType: currentUser ? 'Logged In User' : 'Guest',
-        seating: seating,
+        seatingPreference: seatingPreference,
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       }).then(() => {
         sendBookingTelegram(bookingData);
@@ -3808,10 +3810,14 @@ ${orderItems.map(i => `  • ${i.name} x${i.quantity} = $${(i.price * i.quantity
         hourReset = hourReset - 24;
       }
       document.getElementById('bookingTime').value = `${String(hourReset).padStart(2, '0')}:${String(minuteReset).padStart(2, '0')}`;
-      // Reset seating to default
       document.querySelectorAll('.seat-btn').forEach(b => b.classList.remove('active'));
       document.querySelector('.seat-btn[data-seat="Upstairs"]').classList.add('active');
       document.getElementById('seatingPreference').value = 'Upstairs';
+      
+      // Reset new fields
+      document.getElementById('bookingSeating').value = 'Upstairs';
+      document.getElementById('bookingTable').value = '';
+      document.getElementById('bookingSpecialRequests').value = '';
     });
 
     // ============================================================
@@ -3842,6 +3848,8 @@ ${orderItems.map(i => `  • ${i.name} x${i.quantity} = $${(i.price * i.quantity
     console.log('✅ Blizz Café site initialized!');
     console.log('✅ Google Sign-In now uses redirect method (more reliable).');
     console.log('✅ Logo size increased.');
+    console.log('✅ Hero background image fixed.');
+    console.log('✅ Booking form updated with seating, table, and special request fields.');
   </script>
 </body>
 </html>
