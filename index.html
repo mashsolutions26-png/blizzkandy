@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Blizz Café</title>
   <meta name="description" content="Blizz Café — a cozy café in Kandy, Sri Lanka. Book a table, browse the menu, and check today's hours." />
-  <link rel="icon" type="image/png" sizes="32x32" href="img/logo.webp" />
-  <link rel="icon" type="image/png" sizes="16x16" href="img/logo.webp" />
-  <link rel="apple-touch-icon" href="img/logo.webp" />
+  <link rel="icon" type="image/png" sizes="32x32" href="img/favicon.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="img/favicon.png" />
+  <link rel="apple-touch-icon" href="img/favicon.png" />
 
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-H5RMLCQD7W"></script>
@@ -145,37 +145,64 @@
     .thin-scroll::-webkit-scrollbar { width: 6px; }
     .thin-scroll::-webkit-scrollbar-thumb { background: rgba(244, 185, 62, 0.35); border-radius: 4px; }
 
+    /* ===== HERO BACKGROUND WITH herologo.png ===== */
     .hero-bg {
       background-color: var(--ink);
       background-size: cover;
-      background-position: right center;
+      background-position: center center;
       background-repeat: no-repeat;
-      background-image: url('img/');
+      background-image: url('img/herologo2.png');
     }
 
     .hero-overlay {
       background: linear-gradient(
         115deg,
-        rgba(10, 11, 13, 0.95) 15%,
-        rgba(10, 11, 13, 0.5) 45%,
-        rgba(10, 11, 13, 0.1) 75%,
+        rgba(10, 11, 13, 0.92) 15%,
+        rgba(10, 11, 13, 0.50) 45%,
+        rgba(10, 11, 13, 0.10) 75%,
         rgba(10, 11, 13, 0) 100%
       );
     }
 
+    /* mobile optimization: show building clearly, overlay soft */
     @media (max-width: 768px) {
       .hero-bg {
-        background-size: contain;
-        background-position: top center;
+        background-size: cover;
+        background-position: 85% 50%;
         background-repeat: no-repeat;
       }
       .hero-overlay {
         background: linear-gradient(
           to bottom,
-          rgba(10, 11, 13, 0.35) 0%,
-          rgba(10, 11, 13, 0.75) 55%,
-          rgba(10, 11, 13, 0.95) 100%
+          rgba(10, 11, 13, 0.25) 0%,
+          rgba(10, 11, 13, 0.60) 50%,
+          rgba(10, 11, 13, 0.90) 100%
         );
+      }
+    }
+
+    /* Extra small screens - even more focus on building (right side) */
+    @media (max-width: 480px) {
+      .hero-bg {
+        background-position: 92% 50%;
+        background-size: auto 100%;
+      }
+      .hero-overlay {
+        background: linear-gradient(
+          to bottom,
+          rgba(10, 11, 13, 0.15) 0%,
+          rgba(10, 11, 13, 0.50) 40%,
+          rgba(10, 11, 13, 0.92) 85%,
+          rgba(10, 11, 13, 0.98) 100%
+        );
+      }
+    }
+
+    /* Very small phones */
+    @media (max-width: 380px) {
+      .hero-bg {
+        background-position: 95% 50%;
+        background-size: auto 100%;
       }
     }
 
@@ -1673,7 +1700,7 @@
     </div>
   </div>
 
-  <!-- HERO -->
+  <!-- HERO with herologo.png background -->
   <section id="home" class="relative min-h-screen flex items-center overflow-hidden hero-bg">
     <div class="absolute inset-0 hero-overlay"></div>
     <div class="absolute inset-0 brick-texture opacity-20"></div>
@@ -1783,7 +1810,7 @@
   <section id="discountSpecial" class="discount-special-section border-t border-brickline">
     <div class="discount-special-grid" id="discountSpecialGrid">
       <div class="image-side">
-        <img id="discountSpecialImg" src="img/herologo.jpeg" alt="discount dish" class="rounded-[2rem] lazy-load" loading="lazy">
+        <img id="discountSpecialImg" src="img/herologo.png" alt="discount dish" class="rounded-[2rem] lazy-load" loading="lazy">
       </div>
       <div class="details-side">
         <span class="badge-tag">🔥 Limited Offer</span>
@@ -1853,7 +1880,6 @@
         <input required type="date" id="bookingDate" class="bg-ink border border-cream/15 rounded-xl px-4 py-3 text-sm focus:border-gold/60">
         <input required type="time" id="bookingTime" class="bg-ink border border-cream/15 rounded-xl px-4 py-3 text-sm focus:border-gold/60">
         
-
         <div class="relative sm:col-span-2">
           <select id="guestsSelect" class="w-full bg-ink border border-cream/15 rounded-xl px-4 py-3 text-sm focus:border-gold/60 appearance-none">
             <option value="1 Guest">1 Guest</option>
@@ -3848,7 +3874,8 @@ ${orderItems.map(i => `  • ${i.name} x${i.quantity} = $${(i.price * i.quantity
     console.log('✅ Blizz Café site initialized!');
     console.log('✅ Google Sign-In now uses redirect method (more reliable).');
     console.log('✅ Logo size increased.');
-    console.log('✅ Hero background image fixed.');
+    console.log('✅ Hero background image fixed with herologo.png.');
+    console.log('✅ Mobile view - background-position: 92% 50% for building focus');
     console.log('✅ Booking form updated with seating, table, and special request fields.');
   </script>
 </body>
