@@ -2831,24 +2831,35 @@
         .catch(err => console.error('Error loading favourites:', err));
     }
 
-    function toggleFavourite(itemName) {
-      if (!currentUser) {
-        showOrderNotification('Sign in required', 'Please log in to save favourites.', '❤️', false);
-        openAuthModal();
-        return;
-      }
-      const idx = favourites.indexOf(itemName);
-      const userFavRef = db.collection('users').doc(currentUser.uid).collection('favourites');
-      if (idx > -1) {
-        favourites.splice(idx, 1);
-        userFavRef.doc(itemName).delete().catch(err => console.error('Error removing favourite:', err));
-      } else {
-        favourites.push(itemName);
-        userFavRef.doc(itemName).set({ itemName, userId: currentUser.uid, addedAt: firebase.firestore.FieldValue.serverTimestamp() })
-          .catch(err => console.error('Error adding favourite:', err));
-      }
-      updateFavouriteButtons();
-    }
+function toggleFavourite(itemName) {
+  if (!currentUser) {
+    showOrderNotification('Sign in required', 'Please log in to save favourites.', '❤️', false);
+    openAuthModal();
+    return;
+  }
+  const idx = favourites.indexOf(itemName);
+  const userFavRef = db.collection('users').doc(currentUser.uid).collection('favourites');
+  
+  // Find the menu item to get its price and desc
+  const menuItem = MENU_ITEMS.find(item => item.name === itemName);
+  const price = menuItem ? menuItem.price : 0;
+  const desc = menuItem ? menuItem.desc : '';
+  
+  if (idx > -1) {
+    favourites.splice(idx, 1);
+    userFavRef.doc(itemName).delete().catch(err => console.error('Error removing favourite:', err));
+  } else {
+    favourites.push(itemName);
+    userFavRef.doc(itemName).set({ 
+      itemName, 
+      price: price,
+      desc: desc,
+      userId: currentUser.uid, 
+      addedAt: firebase.firestore.FieldValue.serverTimestamp() 
+    }).catch(err => console.error('Error adding favourite:', err));
+  }
+  updateFavouriteButtons();
+}
 
     function updateFavouriteButtons() {
       document.querySelectorAll('.favourite-btn').forEach(btn => {
@@ -2877,13 +2888,13 @@
         name: 'Sawan (4 Pax)',
         price: 2700,
         desc: 'A feast for four — generous portions of our signature dishes.',
-        image: 'gallery2/p2.webp'
+        image: 'menu/4pax.webp'
       },
       {
         name: 'Nasi Goreng',
         price: 850,
         desc: 'Indonesian-style fried rice with chicken, egg, and sambal.',
-        image: 'gallery2/p3.webp'
+        image: 'menu/nasi2.webp'
       },
       {
         name: 'Cheese & Chicken Mongolian Rice',
@@ -2892,16 +2903,16 @@
         image: 'gallery2/p4.webp'
       },
       {
-        name: 'Zunko Box',
-        price: 900,
+        name: 'Cheese & Chicken Kottu ',
+        price: 950,
         desc: 'A delightful combo box with rice, curry, and your choice of protein.',
-        image: 'gallery2/p5.webp'
+        image: 'menu/cheesekottu.webp'
       },
       {
         name: 'Supreme Cheese Kottu',
         price: 1350,
         desc: 'The ultimate kottu — loaded with extra cheese, chicken, and spices.',
-        image: 'gallery2/p6.webp'
+        image: 'menu/sucheese.webp'
       }
     ];
 

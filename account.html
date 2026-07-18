@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Brick Lane - Profile</title>
+  <title>BLIZZ Kandy - Profile</title>
   <meta name="description" content="Manage your Brick Lane account — profile details, orders and table bookings." />
-    <link rel="icon" type="image/png" sizes="32x32" href="gallery2/logo.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="gallery2/logo.png" />
   <link rel="icon" type="image/png" sizes="16x16" href="gallery2/logo.png" />
   <link rel="apple-touch-icon" href="gallery2/logo.png" />
 
@@ -422,7 +422,7 @@
   <header class="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[94%] max-w-6xl">
     <nav class="glass-nav rounded-2xl px-4 sm:px-6 py-3 flex items-center justify-between">
       <a href="index.html" class="flex items-center gap-2 shrink-0" title="Back to Brick Lane home">
-        <img src="gallery2/logo.png" alt="Brick Lane Logo" class="h-8 w-auto sm:h-10 object-contain rounded-md bg-transparent">
+        <img src="img/logo.webp" alt="The Blizz Kandy" class="h-8 w-auto sm:h-10 object-contain rounded-md bg-transparent">
       </a>
 
       <div class="hidden sm:block font-display text-lg text-cream/90">My Account</div>
@@ -734,13 +734,13 @@
     // FIREBASE INITIALISATION
     // ============================================================
     const firebaseConfig = {
-      apiKey: "AIzaSyBQLWEuZ_ydmR7Xe9vNDYxvZiWMme4wj0M",
-      authDomain: "bricklane-28f56.firebaseapp.com",
-      projectId: "bricklane-28f56",
-      storageBucket: "bricklane-28f56.firebasestorage.app",
-      messagingSenderId: "767079384468",
-      appId: "1:767079384468:web:e76e47f6e151169b4efb81",
-      measurementId: "G-H5RMLCQD7W"
+      apiKey: "AIzaSyB_UdWrxjbuhPiFBSOZGo_mGIIdalUZbx8",
+      authDomain: "blizzkandy.firebaseapp.com",
+      projectId: "blizzkandy",
+      storageBucket: "blizzkandy.firebasestorage.app",
+      messagingSenderId: "705369840142",
+      appId: "1:705369840142:web:310d32d621a8e835c5ba5f",
+      measurementId: "G-GDCLPQVDJ6"
     };
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
@@ -899,13 +899,17 @@
     function listenToFavourites() {
       if (favUnsub) favUnsub();
       if (!currentUser) return;
-      favUnsub = db.collection('favourites').doc(currentUser.uid)
-        .onSnapshot(doc => {
-          if (doc.exists && doc.data().items) {
-            favourites = doc.data().items || [];
-          } else {
-            favourites = [];
-          }
+      favUnsub = db.collection('users').doc(currentUser.uid).collection('favourites')
+        .onSnapshot(snapshot => {
+          favourites = [];
+          snapshot.forEach(doc => {
+            const data = doc.data();
+            favourites.push({
+              name: data.itemName || data.name || doc.id,
+              price: data.price || 0,
+              desc: data.desc || ''
+            });
+          });
           renderFavourites();
         }, err => {
           console.error('Favourites listener error:', err);
@@ -916,51 +920,82 @@
 
     function loadFavouritesFromLocalStorage() {
       try {
-        return JSON.parse(localStorage.getItem('brickLaneFavourites')) || [];
+        return JSON.parse(localStorage.getItem('blizzFavourites')) || [];
       } catch { return []; }
     }
 
     function saveFavouritesToLocalStorage() {
-      localStorage.setItem('brickLaneFavourites', JSON.stringify(favourites));
+      localStorage.setItem('blizzFavourites', JSON.stringify(favourites));
     }
 
     function saveFavouritesToFirestore() {
       if (!currentUser) return;
-      db.collection('favourites').doc(currentUser.uid).set({
-        items: favourites,
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      const batch = db.batch();
+      const favRef = db.collection('users').doc(currentUser.uid).collection('favourites');
+      // Clear existing and add new ones
+      favRef.get().then(snap => {
+        snap.forEach(doc => batch.delete(doc.ref));
+        favourites.forEach(fav => {
+          const docRef = favRef.doc(fav.name);
+          batch.set(docRef, {
+            itemName: fav.name,
+            price: fav.price || 0,
+            desc: fav.desc || '',
+            addedAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+        });
+        return batch.commit();
       }).catch(err => console.error('Error saving favourites:', err));
     }
 
     function removeFavourite(itemName) {
-      favourites = favourites.filter(f => f.name !== itemName);
-      saveFavouritesToLocalStorage();
-      saveFavouritesToFirestore();
-      renderFavourites();
-      showToast('Removed', itemName + ' removed from favourites.', '♡');
+      if (!currentUser) return;
+      db.collection('users').doc(currentUser.uid).collection('favourites').doc(itemName).delete()
+        .then(() => {
+          favourites = favourites.filter(f => f.name !== itemName);
+          renderFavourites();
+          showToast('Removed', itemName + ' removed from favourites.', '♡');
+        })
+        .catch(err => {
+          console.error('Error removing favourite:', err);
+          favourites = favourites.filter(f => f.name !== itemName);
+          renderFavourites();
+          showToast('Removed', itemName + ' removed from favourites (local).', '♡');
+        });
     }
 
-    function addFavouriteToCart(item) {
-      // Add to cart via the same cart system
-      const existing = window.cart ? window.cart.find(i => i.name === item.name) : null;
-      if (existing) {
-        existing.quantity += 1;
-      } else {
-        if (typeof window.cart !== 'undefined') {
-          window.cart.push({ name: item.name, price: item.price, quantity: 1, desc: item.desc || '' });
+    // Expose functions to window for inline onclick
+    window.removeFavourite = removeFavourite;
+    window.addFavouriteToCart = function(item) {
+      // This function is called from the favourites page
+      // It adds the item to the cart - we need to use the same cart system as index.html
+      // Since we're on the account page, we'll use localStorage and show toast
+      try {
+        let cart = JSON.parse(localStorage.getItem('blizzCafeCart')) || [];
+        const existing = cart.find(i => i.name === item.name);
+        if (existing) {
+          existing.quantity += 1;
+        } else {
+          cart.push({ 
+            name: item.name, 
+            price: item.price || 0, 
+            quantity: 1, 
+            desc: item.desc || '',
+            orderType: 'pickup',
+            table: 'Pickup'
+          });
         }
+        localStorage.setItem('blizzCafeCart', JSON.stringify(cart));
+        showToast('Added to Cart', item.name + ' added to your order.', '🛒');
+        // If we're on the main site, also update the cart UI there
+        if (typeof window.updateCartUI === 'function') {
+          window.updateCartUI();
+        }
+      } catch (e) {
+        console.error('Error adding to cart:', e);
+        showToast('Error', 'Could not add item to cart.', '⚠️');
       }
-      if (typeof window.updateCartUI === 'function') {
-        window.updateCartUI();
-      }
-      if (typeof window.saveCartToLocalStorage === 'function') {
-        window.saveCartToLocalStorage();
-      }
-      if (typeof window.saveCartToFirestore === 'function') {
-        window.saveCartToFirestore();
-      }
-      showToast('Added to Cart', item.name + ' added to your order.', '🛒');
-    }
+    };
 
     function renderFavourites() {
       const container = document.getElementById('favouritesList');
@@ -977,7 +1012,7 @@
         return;
       }
 
-      if (favourites.length === 0) {
+      if (!favourites || favourites.length === 0) {
         container.innerHTML = `
           <div class="empty-state">
             <div class="empty-icon">❤️</div>
@@ -988,7 +1023,6 @@
         return;
       }
 
-      // ⭐ FIXED: No gap between cards - like the screenshot
       container.innerHTML = `
         <div class="fav-items-container">
           ${favourites.map(item => `
@@ -997,9 +1031,9 @@
                 <h4>${item.name}</h4>
                 <p>${item.desc || ''}</p>
               </div>
-              <div class="fav-price">$${(item.price || 0).toFixed(2)}</div>
+              <div class="fav-price">Rs. ${(item.price || 0).toFixed(0)}</div>
               <div class="fav-actions">
-                <button class="fav-order-btn" onclick="window.addFavouriteToCart && window.addFavouriteToCart({name:'${item.name.replace(/'/g, "\\'")}', price:${item.price}, desc:'${(item.desc || '').replace(/'/g, "\\'")}'})">
+                <button class="fav-order-btn" onclick="window.addFavouriteToCart && window.addFavouriteToCart({name:'${item.name.replace(/'/g, "\\'")}', price:${item.price || 0}, desc:'${(item.desc || '').replace(/'/g, "\\'")}'})">
                   Order
                 </button>
                 <button class="fav-remove-btn" onclick="window.removeFavourite && window.removeFavourite('${item.name.replace(/'/g, "\\'")}')">
@@ -1010,10 +1044,6 @@
           `).join('')}
         </div>
       `;
-
-      // Add function references to window so inline onclick works
-      window.addFavouriteToCart = addFavouriteToCart;
-      window.removeFavourite = removeFavourite;
     }
 
     // ============================================================
@@ -1158,6 +1188,7 @@
 
     function listenToOrders() {
       if (ordersUnsub) ordersUnsub();
+      if (!currentUser) return;
       ordersUnsub = db.collection('orders')
         .where('userId', '==', currentUser.uid)
         .orderBy('createdAt', 'desc')
@@ -1180,6 +1211,7 @@
 
     function renderOrderList(orders, containerId, emptyText) {
       var container = document.getElementById(containerId);
+      if (!container) return;
       if (orders.length === 0) {
         container.innerHTML = '<p class="text-cream/40 text-sm">' + emptyText + '</p>';
         return;
@@ -1193,7 +1225,7 @@
               <div class="min-w-0">
                 <p class="font-mono text-xs text-gold mb-1">${order.orderId || order.id}</p>
                 <p class="font-semibold text-sm">${itemsList || 'Order items'}</p>
-                <p class="text-cream/50 text-xs mt-1">$${(order.total || 0).toFixed(2)} · ${order.branch || ''}</p>
+                <p class="text-cream/50 text-xs mt-1">Rs. ${(order.total || 0).toFixed(0)} · ${order.branch || ''}</p>
                 <p class="text-cream/30 text-[11px] mt-1">${date}</p>
               </div>
               <span class="text-[10px] font-bold px-2 py-0.5 rounded-full border ${getStatusClass(order.status)} shrink-0">${order.status || 'Confirmed'}</span>
@@ -1258,8 +1290,8 @@
       (order.items || []).forEach(function(item) {
         doc.text(String(item.name || ''), 18, y);
         doc.text(String(item.quantity || 1), 140, y);
-        doc.text('$' + (item.price || 0).toFixed(2), 160, y);
-        doc.text('$' + ((item.price || 0) * (item.quantity || 1)).toFixed(2), 178, y);
+        doc.text('Rs. ' + (item.price || 0).toFixed(0), 160, y);
+        doc.text('Rs. ' + ((item.price || 0) * (item.quantity || 1)).toFixed(0), 178, y);
         y += 7;
       });
 
@@ -1269,15 +1301,15 @@
       y += 8;
 
       doc.text('Subtotal', 140, y);
-      doc.text('$' + (order.subtotal || 0).toFixed(2), 178, y);
+      doc.text('Rs. ' + (order.subtotal || 0).toFixed(0), 178, y);
       y += 7;
       doc.text('Service Fee', 140, y);
-      doc.text('$' + (order.serviceFee || 0).toFixed(2), 178, y);
+      doc.text('Rs. ' + (order.serviceFee || 0).toFixed(0), 178, y);
       y += 8;
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(12);
       doc.text('TOTAL', 140, y);
-      doc.text('$' + (order.total || 0).toFixed(2), 178, y);
+      doc.text('Rs. ' + (order.total || 0).toFixed(0), 178, y);
 
       y += 20;
       doc.setFont('helvetica', 'normal');
@@ -1293,6 +1325,7 @@
     // ============================================================
     function listenToBookings() {
       if (bookingsUnsub) bookingsUnsub();
+      if (!currentUser) return;
       bookingsUnsub = db.collection('bookings')
         .where('uid', '==', currentUser.uid)
         .orderBy('createdAt', 'desc')
@@ -1312,6 +1345,7 @@
 
     function renderBookingsList(bookings) {
       var container = document.getElementById('bookingsList');
+      if (!container) return;
       if (bookings.length === 0) {
         container.innerHTML = '<p class="text-cream/40 text-sm">You have no table bookings yet.</p>';
         return;
@@ -1391,6 +1425,16 @@
 
       doc.save('BrickLane-Booking-' + (booking.bookingId || booking.id) + '.pdf');
     }
+
+    // ============================================================
+    // INITIAL SETUP
+    // ============================================================
+    // After auth state changes, the page will render based on user state.
+    // The renderTab function will call renderFavourites when on favourites tab.
+    console.log('✅ Account page initialized with Firebase');
+    console.log('✅ Favourites stored in users/{uid}/favourites collection');
+    console.log('✅ Orders stored in orders collection with userId filter');
+    console.log('✅ Bookings stored in bookings collection with uid filter');
   </script>
 </body>
 </html>
