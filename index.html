@@ -886,65 +886,94 @@
       }
     }
 
+    /* ===== ORDER NOTIFICATION — COMPACT + AUTO CLOSE ===== */
     .order-notification-success {
       position: fixed;
-      bottom: 30px;
-      right: 30px;
+      bottom: 24px;
+      right: 24px;
       z-index: 9999;
       background: #1a1e24;
-      border: 1px solid rgba(244, 185, 62, 0.3);
-      border-radius: 16px;
-      padding: 20px 24px;
-      max-width: 400px;
-      min-width: 300px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.7);
-      animation: slideUp 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+      border: 1px solid rgba(244, 185, 62, 0.25);
+      border-radius: 14px;
+      padding: 14px 18px;
+      max-width: 360px;
+      min-width: 260px;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.7);
+      animation: slideUp 0.4s cubic-bezier(0.22, 1, 0.36, 1);
       backdrop-filter: blur(12px);
       background: rgba(26, 30, 36, 0.95);
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
     .order-notification-success .notif-icon {
-      font-size: 32px;
-      margin-right: 14px;
+      font-size: 24px;
       flex-shrink: 0;
+      line-height: 1;
     }
     .order-notification-success .notif-content {
       flex: 1;
+      min-width: 0;
     }
     .order-notification-success .notif-title {
       font-weight: 700;
       color: #f4b93e;
-      font-size: 16px;
-      margin-bottom: 4px;
+      font-size: 14px;
+      margin-bottom: 2px;
+      line-height: 1.3;
     }
     .order-notification-success .notif-message {
       color: #b0b0b0;
-      font-size: 14px;
+      font-size: 12px;
       line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
     .order-notification-success .notif-close {
       background: none;
       border: none;
       color: #666;
-      font-size: 20px;
+      font-size: 18px;
       cursor: pointer;
-      padding: 0 0 0 12px;
+      padding: 0 0 0 8px;
       transition: color 0.2s;
+      flex-shrink: 0;
+      line-height: 1;
     }
     .order-notification-success .notif-close:hover {
       color: #f4b93e;
     }
+
     @keyframes slideUp {
-      0% { opacity: 0; transform: translateY(30px) scale(0.95); }
+      0% { opacity: 0; transform: translateY(24px) scale(0.95); }
       100% { opacity: 1; transform: translateY(0) scale(1); }
     }
+
     @media (max-width: 500px) {
       .order-notification-success {
-        right: 10px;
-        left: 10px;
+        right: 12px;
+        left: 12px;
         min-width: unset;
         max-width: unset;
-        bottom: 20px;
-        padding: 16px 18px;
+        bottom: 16px;
+        padding: 12px 14px;
+        border-radius: 12px;
+        gap: 10px;
+      }
+      .order-notification-success .notif-icon {
+        font-size: 20px;
+      }
+      .order-notification-success .notif-title {
+        font-size: 13px;
+      }
+      .order-notification-success .notif-message {
+        font-size: 11px;
+      }
+      .order-notification-success .notif-close {
+        font-size: 16px;
+        padding-left: 6px;
       }
     }
 
@@ -1771,13 +1800,13 @@
     <div class="relative z-10 max-w-6xl mx-auto px-6 sm:px-10 pt-32 pb-20 w-full">
       <div class="max-w-xl">
         <span class="inline-flex items-center gap-2 text-xs tracking-[0.2em] uppercase text-gold/90 border border-gold/30 rounded-full px-3 py-1 mb-6 bg-ink/40 backdrop-blur-sm">
-          One Of The Best Places In Kandy
+          Cozy & Modern Cafe Vibe
         </span>
         <h1 class="font-display text-5xl sm:text-6xl md:text-7xl leading-[0.95] mb-6">
-          Coffee & toast,<br /><span class="italic text-gold">brick by brick.</span>
+          Big hunger,<br /><span class="italic text-gold">Heavy plates</span>
         </h1>
         <p class="text-cream/80 text-base sm:text-lg mb-8 leading-relaxed max-w-lg">
-          A cozy café slinging honest breakfasts and slow-drip coffee from a hidden corner of Kandy. No pretense — just brick walls, good light, and a kitchen that opens early.
+          Real comfort food and true island hospitality from a sunlit nook in Kandy. A chill space designed to slow down and savor every bite
         </p>
         <div class="flex flex-wrap gap-4">
           <a href="index.html#book" class="bg-gold text-ink font-semibold px-6 py-3 rounded-full hover:brightness-110 transition glow-gold">Book a Table</a>
@@ -2051,13 +2080,13 @@
           <div class="slide"><img src="gallery2/p7.webp" alt="gallery" loading="lazy"></div>
           <div class="slide"><img src="gallery2/p8.webp" alt="gallery" loading="lazy"></div>
           <div class="slide"><img src="gallery2/p9.webp" alt="gallery" loading="lazy"></div>
+          <div class="slide"><img src="gallery2/p11.webp" alt="gallery" loading="lazy"></div>
+          <div class="slide"><img src="gallery2/p7.webp" alt="gallery" loading="lazy"></div>
           <div class="slide"><img src="gallery2/p1.webp" alt="gallery" loading="lazy"></div>
-          <div class="slide"><img src="gallery2/p2.webp" alt="gallery" loading="lazy"></div>
           <div class="slide"><img src="gallery2/p3.webp" alt="gallery" loading="lazy"></div>
-          <div class="slide"><img src="gallery2/p4.webp" alt="gallery" loading="lazy"></div>
+          <div class="slide"><img src="gallery2/p2.webp" alt="gallery" loading="lazy"></div>
           <div class="slide"><img src="gallery2/p5.webp" alt="gallery" loading="lazy"></div>
           <div class="slide"><img src="gallery2/p6.webp" alt="gallery" loading="lazy"></div>
-          <div class="slide"><img src="gallery2/p7.webp" alt="gallery" loading="lazy"></div>
           <div class="slide"><img src="gallery2/p8.webp" alt="gallery" loading="lazy"></div>
           <div class="slide"><img src="gallery2/p9.webp" alt="gallery" loading="lazy"></div>
           <div class="slide"><img src="gallery2/p10.webp" alt="gallery" loading="lazy"></div>
@@ -2882,7 +2911,7 @@ function toggleFavourite(itemName) {
         name: 'Chicken Kottu',
         price: 850,
         desc: 'Classic Sri Lankan street food — chopped roti with chicken, egg, and veggies.',
-        image: 'gallery2/p1.webp'
+        image: 'menu/chickenkottu.webp'
       },
       {
         name: 'Sawan (4 Pax)',
@@ -2912,7 +2941,7 @@ function toggleFavourite(itemName) {
         name: 'Supreme Cheese Kottu',
         price: 1350,
         desc: 'The ultimate kottu — loaded with extra cheese, chicken, and spices.',
-        image: 'menu/sucheese.webp'
+        image: 'menu/sucheese1.webp'
       }
     ];
 
@@ -3206,7 +3235,7 @@ function toggleFavourite(itemName) {
     }
 
     // ============================================================
-    // ORDER NOTIFICATION
+    // ORDER NOTIFICATION — COMPACT + AUTO CLOSE (3 seconds)
     // ============================================================
     function showOrderNotification(title, message, icon = '✅', isSuccess = true) {
       const existing = document.querySelector('.order-notification-success');
@@ -3226,7 +3255,7 @@ function toggleFavourite(itemName) {
 
       const timer = setTimeout(() => {
         if (notif.parentNode) notif.remove();
-      }, 8000);
+      }, 3000); // 3 seconds auto-close
 
       notif.querySelector('.notif-close').addEventListener('click', () => {
         clearTimeout(timer);
