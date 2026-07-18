@@ -2308,11 +2308,16 @@
       appId: "1:705369840142:web:310d32d621a8e835c5ba5f",
       measurementId: "G-GDCLPQVDJ6"
     };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-
-    auth.useDeviceLanguage();
+    let auth = null;
+    let db = null;
+    try {
+      firebase.initializeApp(firebaseConfig);
+      auth = firebase.auth();
+      db = firebase.firestore();
+      auth.useDeviceLanguage();
+    } catch (err) {
+      console.error('⚠️ Firebase failed to initialise (site will still work, but login/cart-sync/ordering features may be limited):', err);
+    }
 
     // Telegram Bot Config
     const TELEGRAM_BOT_TOKEN = '8978617133:AAH7EZX77R9JuwhHKBOW256xnxTnqDHyHgo';
@@ -2619,6 +2624,8 @@
     // ============================================================
     // MAIN COUNTDOWN + STATUS BADGE
     // ============================================================
+    let countdownIntervalId = null;
+
     function computeStatus(schedule) {
       const now = getSriLankaNow();
       const nowMinutes = now.hour * 60 + now.minute + now.second / 60;
@@ -3558,60 +3565,66 @@ ${orderItems.map(i => `  • ${i.name} x${i.quantity} = Rs. ${(i.price * i.quant
     // ============================================================
     // AUTH STATE LISTENER
     // ============================================================
-    auth.onAuthStateChanged((user) => {
-      currentUser = user;
-      const icon = document.getElementById('profileIcon');
-      const initial = document.getElementById('profileInitial');
+    if (auth) {
+      auth.onAuthStateChanged((user) => {
+        currentUser = user;
+        const icon = document.getElementById('profileIcon');
+        const initial = document.getElementById('profileInitial');
 
-      if (user) {
-        const displayName = user.displayName || user.email || 'Guest';
-        icon.classList.add('hidden');
-        initial.classList.remove('hidden');
-        initial.textContent = displayName.charAt(0).toUpperCase();
-        updateMobileProfile();
-        loadCartFromFirestore();
-        loadFavouritesFromFirestore();
-        
-        if (!authOverlay.classList.contains('hidden')) {
-          closeAuthModal();
+        if (user) {
+          const displayName = user.displayName || user.email || 'Guest';
+          icon.classList.add('hidden');
+          initial.classList.remove('hidden');
+          initial.textContent = displayName.charAt(0).toUpperCase();
+          updateMobileProfile();
+          loadCartFromFirestore();
+          loadFavouritesFromFirestore();
+
+          if (!authOverlay.classList.contains('hidden')) {
+            closeAuthModal();
+          }
+
+          showOrderNotification(
+            'Welcome!',
+            `Signed in as ${displayName}`,
+            '👋',
+            true
+          );
+        } else {
+          icon.classList.remove('hidden');
+          initial.classList.add('hidden');
+          updateMobileProfile();
+          loadCartFromLocalStorage();
+          favourites = [];
+          updateFavouriteButtons();
         }
-        
-        showOrderNotification(
-          'Welcome!', 
-          `Signed in as ${displayName}`,
-          '👋',
-          true
-        );
-      } else {
-        icon.classList.remove('hidden');
-        initial.classList.add('hidden');
-        updateMobileProfile();
-        loadCartFromLocalStorage();
-        favourites = [];
-        updateFavouriteButtons();
-      }
-    });
+      });
+    } else {
+      console.error('⚠️ Auth listener skipped — Firebase auth is unavailable.');
+    }
 
     // Handle redirect result for Google Sign-In
-    auth.getRedirectResult().then((result) => {
-      if (result.user) {
-        const user = result.user;
-        db.collection('users').doc(user.uid).set({
-          name: user.displayName || 'Google User',
-          email: user.email,
-          phone: user.phoneNumber || '',
-          photoURL: user.photoURL || '',
-          lastLogin: firebase.firestore.FieldValue.serverTimestamp()
-        }, { merge: true }).then(() => {
-          console.log('✅ Google user saved to Firestore');
-        }).catch(err => console.error('Error saving Google user:', err));
-      }
-    }).catch((error) => {
-      console.error('Google Redirect Error:', error);
-      if (error.code !== 'auth/popup-closed-by-user') {
-        showAuthError(error.message || 'Google sign-in failed. Please try again.');
-      }
-    });
+    if (auth) {
+      auth.getRedirectResult().then((result) => {
+        if (result.user) {
+          const user = result.user;
+          db.collection('users').doc(user.uid).set({
+            name: user.displayName || 'Google User',
+            email: user.email,
+            phone: user.phoneNumber || '',
+            photoURL: user.photoURL || '',
+            lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+          }, { merge: true }).then(() => {
+            console.log('✅ Google user saved to Firestore');
+          }).catch(err => console.error('Error saving Google user:', err));
+        }
+      }).catch((error) => {
+        console.error('Google Redirect Error:', error);
+        if (error.code !== 'auth/popup-closed-by-user') {
+          showAuthError(error.message || 'Google sign-in failed. Please try again.');
+        }
+      });
+    }
 
     // ============================================================
     // NEW AUTO SLIDER (FOOD SLIDER)
@@ -3927,29 +3940,40 @@ ${orderItems.map(i => `  • ${i.name} x${i.quantity} = Rs. ${(i.price * i.quant
     document.getElementById('branchLabelHours').textContent = b.name;
     document.getElementById('branchLabelBook').textContent = b.name;
 
-    loadCartFromLocalStorage();
-    renderStatus();
-    renderDailySpecial();
-    renderMenu();
-    setupProfileLinks();
+    // Start the shop open/close countdown FIRST and on its own, so it can
+    // never be blocked or broken by a Firebase / network problem below.
+    try {
+      renderStatus();
+      if (countdownIntervalId) {
+        clearInterval(countdownIntervalId);
+      }
+      countdownIntervalId = setInterval(renderStatus, 1000);
+      console.log('✅ Countdown started (independent of Firebase)');
+    } catch (err) {
+      console.error('⚠️ Countdown failed to start:', err);
+    }
+
+    try { loadCartFromLocalStorage(); } catch (err) { console.error('⚠️ Cart load failed:', err); }
+    try { renderDailySpecial(); } catch (err) { console.error('⚠️ Daily special render failed:', err); }
+    try { renderMenu(); } catch (err) { console.error('⚠️ Menu render failed:', err); }
+    try { setupProfileLinks(); } catch (err) { console.error('⚠️ Profile links setup failed:', err); }
 
     console.log('🔄 Starting discount listener...');
-    listenDiscounts();
+    try { listenDiscounts(); } catch (err) { console.error('⚠️ Discount listener failed:', err); }
 
     console.log('🔄 Starting daily special listener...');
-    listenDailySpecials();
+    try { listenDailySpecials(); } catch (err) { console.error('⚠️ Daily special listener failed:', err); }
 
     console.log('🔄 Initializing booking validation...');
-    initBookingValidation();
+    try { initBookingValidation(); } catch (err) { console.error('⚠️ Booking validation failed:', err); }
 
-    setInterval(renderStatus, 1000);
-    
     console.log('✅ Blizz Café site initialized!');
     console.log('✅ 6 most selling items added with updated prices (Rs.)');
     console.log('✅ Service fee changed to 5%');
     console.log('✅ Pickup / On Shop selector added with table list for On Shop');
     console.log('✅ All prices displayed in Rs.');
     console.log('✅ Removed image carousels from menu items and replaced with single static images.');
+    console.log('✅ Countdown now updates live without resetting on refresh');
   </script>
 </body>
 </html>
