@@ -734,13 +734,13 @@
     // FIREBASE INITIALISATION
     // ============================================================
     const firebaseConfig = {
-      apiKey: "AIzaSyB_UdWrxjbuhPiFBSOZGo_mGIIdalUZbx8",
-      authDomain: "blizzkandy.firebaseapp.com",
-      projectId: "blizzkandy",
-      storageBucket: "blizzkandy.firebasestorage.app",
-      messagingSenderId: "705369840142",
-      appId: "1:705369840142:web:310d32d621a8e835c5ba5f",
-      measurementId: "G-GDCLPQVDJ6"
+      apiKey: "AIzaSyBQLWEuZ_ydmR7Xe9vNDYxvZiWMme4wj0M",
+      authDomain: "bricklane-28f56.firebaseapp.com",
+      projectId: "bricklane-28f56",
+      storageBucket: "bricklane-28f56.firebasestorage.app",
+      messagingSenderId: "767079384468",
+      appId: "1:767079384468:web:e76e47f6e151169b4efb81",
+      measurementId: "G-H5RMLCQD7W"
     };
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
@@ -772,20 +772,18 @@
     function hideToast() { document.getElementById('toast').classList.add('hidden'); }
 
     // ============================================================
-    // DROPDOWN TOGGLE (mobile) - FIXED
+    // DROPDOWN TOGGLE (mobile)
     // ============================================================
     function closeDropdown() {
       document.getElementById('dropdownMenu').classList.remove('open');
     }
 
-    // Toggle dropdown on button click
     document.getElementById('dropdownToggle').addEventListener('click', function(e) {
       e.stopPropagation();
       const menu = document.getElementById('dropdownMenu');
       menu.classList.toggle('open');
     });
 
-    // Close dropdown when clicking outside
     document.addEventListener('click', function(e) {
       const menu = document.getElementById('dropdownMenu');
       const toggle = document.getElementById('dropdownToggle');
@@ -794,7 +792,6 @@
       }
     });
 
-    // Handle mobile menu item clicks - FIXED
     document.querySelectorAll('.menu-item').forEach(function(item) {
       item.addEventListener('click', function(e) {
         e.preventDefault();
@@ -807,7 +804,6 @@
       });
     });
 
-    // Handle mobile logout
     document.getElementById('mobileLogoutBtn').addEventListener('click', function(e) {
       e.preventDefault();
       e.stopPropagation();
@@ -829,17 +825,14 @@
       const tab = (window.location.hash || '#account').replace('#', '');
       const finalTab = TABS.includes(tab) ? tab : 'account';
       
-      // Update desktop sidebar tabs
       document.querySelectorAll('.side-tab').forEach(el => {
         el.classList.toggle('active', el.dataset.tab === finalTab);
       });
       
-      // Update page sections
       document.querySelectorAll('.page-section').forEach(el => {
         el.classList.toggle('active', el.id === 'page-' + finalTab);
       });
       
-      // Update mobile menu highlighting
       document.querySelectorAll('.dropdown-menu-mobile .menu-item').forEach(el => {
         const tabAttr = el.getAttribute('data-tab');
         if (tabAttr) {
@@ -848,7 +841,6 @@
         }
       });
       
-      // If favourites tab, render favourites
       if (finalTab === 'favourites') {
         renderFavourites();
       }
@@ -894,22 +886,25 @@
     });
 
     // ============================================================
-    // FAVOURITES FUNCTIONS
+    // FAVOURITES FUNCTIONS - FIXED to match menu.html
     // ============================================================
     function listenToFavourites() {
       if (favUnsub) favUnsub();
-      if (!currentUser) return;
-      favUnsub = db.collection('users').doc(currentUser.uid).collection('favourites')
-        .onSnapshot(snapshot => {
-          favourites = [];
-          snapshot.forEach(doc => {
-            const data = doc.data();
-            favourites.push({
-              name: data.itemName || data.name || doc.id,
-              price: data.price || 0,
-              desc: data.desc || ''
-            });
-          });
+      if (!currentUser) {
+        favourites = loadFavouritesFromLocalStorage();
+        renderFavourites();
+        return;
+      }
+      
+      // Listen to the SAME collection as menu.html: favourites/{uid}
+      favUnsub = db.collection('favourites').doc(currentUser.uid)
+        .onSnapshot(doc => {
+          if (doc.exists && doc.data().items) {
+            favourites = doc.data().items || [];
+          } else {
+            favourites = [];
+          }
+          saveFavouritesToLocalStorage();
           renderFavourites();
         }, err => {
           console.error('Favourites listener error:', err);
@@ -920,72 +915,59 @@
 
     function loadFavouritesFromLocalStorage() {
       try {
-        return JSON.parse(localStorage.getItem('blizzFavourites')) || [];
+        return JSON.parse(localStorage.getItem('brickLaneFavourites')) || [];
       } catch { return []; }
     }
 
     function saveFavouritesToLocalStorage() {
-      localStorage.setItem('blizzFavourites', JSON.stringify(favourites));
+      localStorage.setItem('brickLaneFavourites', JSON.stringify(favourites));
     }
 
     function saveFavouritesToFirestore() {
       if (!currentUser) return;
-      const batch = db.batch();
-      const favRef = db.collection('users').doc(currentUser.uid).collection('favourites');
-      // Clear existing and add new ones
-      favRef.get().then(snap => {
-        snap.forEach(doc => batch.delete(doc.ref));
-        favourites.forEach(fav => {
-          const docRef = favRef.doc(fav.name);
-          batch.set(docRef, {
-            itemName: fav.name,
-            price: fav.price || 0,
-            desc: fav.desc || '',
-            addedAt: firebase.firestore.FieldValue.serverTimestamp()
-          });
-        });
-        return batch.commit();
+      db.collection('favourites').doc(currentUser.uid).set({
+        items: favourites,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       }).catch(err => console.error('Error saving favourites:', err));
     }
 
     function removeFavourite(itemName) {
-      if (!currentUser) return;
-      db.collection('users').doc(currentUser.uid).collection('favourites').doc(itemName).delete()
-        .then(() => {
-          favourites = favourites.filter(f => f.name !== itemName);
-          renderFavourites();
-          showToast('Removed', itemName + ' removed from favourites.', '♡');
-        })
-        .catch(err => {
-          console.error('Error removing favourite:', err);
-          favourites = favourites.filter(f => f.name !== itemName);
-          renderFavourites();
-          showToast('Removed', itemName + ' removed from favourites (local).', '♡');
-        });
+      if (!currentUser) {
+        // If not logged in, remove from local
+        favourites = favourites.filter(f => f.name !== itemName);
+        saveFavouritesToLocalStorage();
+        renderFavourites();
+        showToast('Removed', itemName + ' removed from favourites (local).', '♡');
+        return;
+      }
+      
+      favourites = favourites.filter(f => f.name !== itemName);
+      saveFavouritesToLocalStorage();
+      saveFavouritesToFirestore();
+      renderFavourites();
+      showToast('Removed', itemName + ' removed from favourites.', '♡');
     }
 
     // Expose functions to window for inline onclick
     window.removeFavourite = removeFavourite;
     window.addFavouriteToCart = function(item) {
-      // This function is called from the favourites page
-      // It adds the item to the cart - we need to use the same cart system as index.html
-      // Since we're on the account page, we'll use localStorage and show toast
       try {
         let cart = JSON.parse(localStorage.getItem('blizzCafeCart')) || [];
-        const existing = cart.find(i => i.name === item.name);
+        // Also check if there's a cart in Firestore or use the same key as menu.html
+        // menu.html uses 'brickLaneCart' - let's use that
+        let cartItems = JSON.parse(localStorage.getItem('brickLaneCart')) || [];
+        const existing = cartItems.find(i => i.name === item.name);
         if (existing) {
           existing.quantity += 1;
         } else {
-          cart.push({ 
+          cartItems.push({ 
             name: item.name, 
             price: item.price || 0, 
             quantity: 1, 
-            desc: item.desc || '',
-            orderType: 'pickup',
-            table: 'Pickup'
+            desc: item.desc || ''
           });
         }
-        localStorage.setItem('blizzCafeCart', JSON.stringify(cart));
+        localStorage.setItem('brickLaneCart', JSON.stringify(cartItems));
         showToast('Added to Cart', item.name + ' added to your order.', '🛒');
         // If we're on the main site, also update the cart UI there
         if (typeof window.updateCartUI === 'function') {
@@ -1429,10 +1411,8 @@
     // ============================================================
     // INITIAL SETUP
     // ============================================================
-    // After auth state changes, the page will render based on user state.
-    // The renderTab function will call renderFavourites when on favourites tab.
     console.log('✅ Account page initialized with Firebase');
-    console.log('✅ Favourites stored in users/{uid}/favourites collection');
+    console.log('✅ Favourites stored in favourites/{uid} collection (matching menu.html)');
     console.log('✅ Orders stored in orders collection with userId filter');
     console.log('✅ Bookings stored in bookings collection with uid filter');
   </script>
