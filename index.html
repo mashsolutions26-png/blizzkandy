@@ -713,15 +713,51 @@
       }
     }
 
-    /* NEW FOOTER */
+    /* ============================================================
+       FOOTER — BLIZZ CAFÉ (redesigned to match site theme)
+       ============================================================ */
     .minimal-footer {
-      background: #1A1A1A;
-      color: white;
-      padding: 80px 0 40px;
-      border-top: 1px solid rgba(255,255,255,0.06);
+      position: relative;
+      background: var(--ink);
+      color: var(--cream);
+      padding: 96px 0 40px;
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    /* animated gold->crimson shimmer line at the very top of the footer */
+    .minimal-footer::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(244,185,62,0.9) 20%,
+        rgba(200,16,46,0.9) 50%,
+        rgba(244,185,62,0.9) 80%,
+        transparent 100%);
+      background-size: 200% 100%;
+      animation: footerShimmer 6s linear infinite;
+    }
+
+    @keyframes footerShimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* soft drifting glow blobs behind the footer content, reuses .footer-drift keyframes */
+    .footer-glow {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      opacity: .8;
     }
 
     .footer-container {
+      position: relative;
+      z-index: 1;
       max-width: 1200px;
       margin: 0 auto;
       padding: 0 20px;
@@ -731,8 +767,20 @@
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 40px;
-      margin-bottom: 60px;
+      margin-bottom: 56px;
     }
+
+    /* scroll-reveal for each footer column */
+    .footer-grid > div {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity .7s cubic-bezier(.16,1,.3,1), transform .7s cubic-bezier(.16,1,.3,1);
+    }
+    .footer-grid > div.in-view { opacity: 1; transform: translateY(0); }
+    .footer-grid > div:nth-child(1) { transition-delay: 0s; }
+    .footer-grid > div:nth-child(2) { transition-delay: .08s; }
+    .footer-grid > div:nth-child(3) { transition-delay: .16s; }
+    .footer-grid > div:nth-child(4) { transition-delay: .24s; }
 
     .footer-logo {
       display: flex;
@@ -742,85 +790,142 @@
 
     .coffee-animation {
       position: relative;
-      display: inline-block;
-      margin-right: 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      margin-right: 14px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 40% 35%, rgba(244,185,62,0.18), rgba(244,185,62,0.02) 70%);
+      border: 1px solid rgba(244,185,62,0.25);
     }
 
     .coffee-icon {
-      font-size: 32px;
-      color: #D4A574;
+      font-size: 20px;
+      color: var(--gold);
       animation: coffeeFloat 3s ease-in-out infinite;
       transform-origin: center;
     }
 
     .coffee-steam {
       position: absolute;
-      width: 4px;
-      background: rgba(212, 165, 116, 0.5);
+      width: 3px;
+      background: linear-gradient(to top, rgba(244,185,62,0.7), transparent);
       border-radius: 2px;
       animation: steamRise 2.5s ease-in-out infinite;
     }
 
-    .steam-1 { height: 16px; top: -10px; left: 6px; animation-delay: 0s; }
-    .steam-2 { height: 12px; top: -7px; left: 18px; animation-delay: 0.8s; }
-    .steam-3 { height: 14px; top: -8px; left: 30px; animation-delay: 1.6s; }
+    .steam-1 { height: 14px; top: -6px; left: 14px; animation-delay: 0s; }
+    .steam-2 { height: 11px; top: -3px; left: 22px; animation-delay: 0.8s; }
+    .steam-3 { height: 13px; top: -4px; left: 30px; animation-delay: 1.6s; }
 
     @keyframes coffeeFloat {
       0%, 100% { transform: translateY(0) rotate(0deg); }
-      50% { transform: translateY(-8px) rotate(3deg); }
+      50% { transform: translateY(-5px) rotate(4deg); }
     }
 
     @keyframes steamRise {
       0% { opacity: 0; transform: translateY(0) scale(0.8); }
-      30% { opacity: 0.8; transform: translateY(-10px) scale(1); }
-      70% { opacity: 0.5; transform: translateY(-20px) scale(1.1); }
-      100% { opacity: 0; transform: translateY(-30px) scale(1.2); }
+      30% { opacity: 0.8; transform: translateY(-8px) scale(1); }
+      70% { opacity: 0.4; transform: translateY(-16px) scale(1.1); }
+      100% { opacity: 0; transform: translateY(-24px) scale(1.2); }
     }
 
     .logo-text {
-      font-family: 'Playfair Display', serif;
+      font-family: 'Fraunces', serif;
       font-size: 24px;
       font-weight: 700;
-      color: #FFFFFF;
-      letter-spacing: 2px;
+      letter-spacing: 1.5px;
+      background: linear-gradient(90deg, var(--cream) 0%, var(--gold) 45%, var(--cream) 55%, var(--gold) 100%);
+      background-size: 250% 100%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: textShimmer 7s linear infinite;
+    }
+
+    @keyframes textShimmer {
+      0% { background-position: 0% 0; }
+      100% { background-position: -250% 0; }
     }
 
     .footer-description {
       font-size: 14px;
-      color: #999;
-      line-height: 1.6;
-      margin-bottom: 20px;
+      color: var(--smoke);
+      line-height: 1.7;
+      margin-bottom: 22px;
+      max-width: 32ch;
     }
 
     .social-links {
       display: flex;
-      gap: 16px;
+      gap: 14px;
       margin-top: 20px;
     }
 
     .social-link {
-      width: 40px;
-      height: 40px;
+      position: relative;
+      width: 42px;
+      height: 42px;
       border-radius: 50%;
-      background: rgba(255,255,255,0.08);
+      background: rgba(244, 185, 62, 0.06);
+      border: 1px solid rgba(244, 185, 62, 0.18);
       display: flex;
       align-items: center;
       justify-content: center;
-      color: white;
+      color: var(--cream);
       text-decoration: none;
-      transition: all 0.3s ease;
+      overflow: hidden;
+      transition: transform .35s cubic-bezier(.34,1.56,.64,1), border-color .35s ease, color .35s ease, box-shadow .35s ease;
+    }
+
+    .social-link::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, var(--gold), var(--crimson));
+      opacity: 0;
+      transition: opacity .35s ease;
+      z-index: -1;
     }
 
     .social-link:hover {
-      background: #D4A574;
-      transform: translateY(-3px);
+      transform: translateY(-4px) scale(1.08);
+      border-color: transparent;
+      color: var(--ink);
+      box-shadow: 0 8px 20px -6px rgba(244, 185, 62, 0.5);
+    }
+
+    .social-link:hover::before {
+      opacity: 1;
     }
 
     .footer-heading {
-      font-size: 18px;
+      position: relative;
+      font-family: 'Fraunces', serif;
+      font-size: 17px;
       font-weight: 600;
-      margin-bottom: 20px;
-      color: white;
+      margin-bottom: 22px;
+      color: var(--cream);
+      display: inline-block;
+      padding-bottom: 10px;
+    }
+
+    .footer-heading::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      height: 2px;
+      width: 28px;
+      background: linear-gradient(90deg, var(--gold), var(--crimson));
+      border-radius: 2px;
+      transition: width .4s ease;
+    }
+
+    .footer-grid > div:hover .footer-heading::after {
+      width: 48px;
     }
 
     .footer-links {
@@ -828,50 +933,111 @@
     }
 
     .footer-links li {
-      margin-bottom: 12px;
+      margin-bottom: 13px;
+      font-size: 14px;
+      color: var(--smoke);
     }
 
     .footer-links a,
     .footer-link-btn {
-      color: #999;
+      position: relative;
+      color: var(--smoke);
       text-decoration: none;
       font-size: 14px;
-      transition: all 0.3s ease;
+      transition: color .3s ease, transform .3s ease;
       background: none;
       border: none;
       cursor: pointer;
-      font-family: 'Inter', sans-serif;
+      font-family: 'Manrope', sans-serif;
       text-align: left;
       padding: 0;
+      display: inline-block;
+    }
+
+    .footer-links a::after,
+    .footer-link-btn::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: -3px;
+      width: 0;
+      height: 1px;
+      background: linear-gradient(90deg, var(--gold), var(--crimson));
+      transition: width .35s ease;
     }
 
     .footer-links a:hover,
     .footer-link-btn:hover {
-      color: #D4A574;
-      padding-left: 8px;
+      color: var(--gold);
+      transform: translateX(4px);
+    }
+
+    .footer-links a:hover::after,
+    .footer-link-btn:hover::after {
+      width: 100%;
     }
 
     .footer-links i {
       margin-right: 8px;
-      color: #D4A574;
+      color: var(--gold);
+      width: 14px;
+      text-align: center;
     }
 
     .footer-bottom {
-      padding-top: 40px;
-      border-top: 1px solid rgba(255,255,255,0.08);
+      position: relative;
+      padding-top: 32px;
+      margin-top: 8px;
+      border-top: 1px solid rgba(244, 185, 62, 0.12);
       text-align: center;
-      color: #999;
-      font-size: 14px;
+      color: var(--smoke);
+      font-size: 13px;
+      letter-spacing: .2px;
     }
 
     .footer-bottom a {
-      color: #D4A574;
+      color: var(--gold);
       text-decoration: none;
       font-weight: 600;
+      transition: color .3s ease;
     }
 
     .footer-bottom a:hover {
+      color: var(--crimson);
       text-decoration: underline;
+    }
+
+    /* back-to-top button */
+    .back-to-top {
+      position: fixed;
+      right: 22px;
+      bottom: 22px;
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--gold), var(--crimson));
+      color: var(--ink);
+      border: none;
+      cursor: pointer;
+      z-index: 60;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(16px);
+      transition: opacity .35s ease, transform .35s ease, visibility .35s;
+      box-shadow: 0 10px 24px -6px rgba(0,0,0,0.5);
+    }
+
+    .back-to-top.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .back-to-top:hover {
+      transform: translateY(-4px) scale(1.06);
     }
 
     @media (max-width: 992px) {
@@ -883,6 +1049,9 @@
     @media (max-width: 768px) {
       .footer-grid {
         grid-template-columns: 1fr;
+      }
+      .minimal-footer {
+        padding: 72px 0 32px;
       }
     }
 
@@ -1702,6 +1871,81 @@
       padding-top: 0.75rem;
       border-top: 1px solid rgba(255,255,255,0.06);
     }
+
+    /* Combo price styling for daily specials */
+    .combo-savings {
+      color: #34d399;
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: rgba(52, 211, 153, 0.12);
+      padding: 0.1rem 0.6rem;
+      border-radius: 9999px;
+      display: inline-block;
+      margin-top: 0.15rem;
+    }
+    .combo-details {
+      color: #b0b0b0;
+      font-size: 0.8rem;
+      line-height: 1.5;
+    }
+    .actual-price-strike {
+      text-decoration: line-through;
+      color: #6a6a6f;
+      font-size: 0.75rem;
+      margin-right: 0.4rem;
+    }
+    .combo-price {
+      color: #f4b93e;
+      font-weight: 700;
+    }
+    .combo-savings-badge {
+      display: inline-block;
+      background: rgba(52, 211, 153, 0.15);
+      border: 1px solid rgba(52, 211, 153, 0.25);
+      border-radius: 9999px;
+      padding: 0.1rem 0.6rem;
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: #34d399;
+      margin-left: 0.3rem;
+    }
+    .combo-items {
+      display: flex;
+      flex-direction: column;
+      gap: 0.1rem;
+      margin-top: 0.2rem;
+    }
+    .combo-item {
+      color: #9a9a9f;
+      font-size: 0.78rem;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .combo-item::before {
+      content: '•';
+      color: #f4b93e;
+    }
+    .combo-subtitle {
+      color: #b0a99b;
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.03em;
+      margin-bottom: 0.15rem;
+    }
+    .combo-badge {
+      display: inline-block;
+      background: rgba(244, 185, 62, 0.12);
+      border: 1px solid rgba(244, 185, 62, 0.2);
+      border-radius: 9999px;
+      padding: 0.05rem 0.6rem;
+      font-size: 0.6rem;
+      font-weight: 700;
+      color: #f4b93e;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-left: 0.3rem;
+    }
   </style>
 </head>
 <body>
@@ -1806,7 +2050,7 @@
           Big hunger,<br /><span class="italic text-gold">Heavy plates</span>
         </h1>
         <p class="text-cream/80 text-base sm:text-lg mb-8 leading-relaxed max-w-lg">
-          Real comfort food and true island hospitality from a sunlit nook in Kandy. A chill space designed to slow down and savor every bite
+          Located in the heart of Kandy, Blizz Cafe brings you an electrifying dining experience with our signature dishes, refreshing beverages, and vibrant atmosphere.
         </p>
         <div class="flex flex-wrap gap-4">
           <a href="index.html#book" class="bg-gold text-ink font-semibold px-6 py-3 rounded-full hover:brightness-110 transition glow-gold">Book a Table</a>
@@ -1857,16 +2101,16 @@
     </div>
   </section>
 
-  <!-- DAILY SPECIAL — WEEKLY LUNCH SPECIALS -->
+  <!-- DAILY SPECIAL — WEEKLY LUNCH SPECIALS (UPDATED WITH COMBO OFFERS) -->
   <section id="dailySpecial" class="py-24 px-6 sm:px-10 border-t border-brickline">
     <div class="max-w-6xl mx-auto">
       <div class="mb-10">
-        <span class="text-xs tracking-[0.25em] uppercase text-gold/80">Every Day · Limited-Time Lunch Deals</span>
+        <span class="text-xs tracking-[0.25em] uppercase text-gold/80">Every Day · Limited-Time Combo Deals</span>
         <h2 class="font-display text-4xl sm:text-5xl mt-3 leading-tight">
-          <span class="text-cream">Weekly Lunch</span><br>
+          <span class="text-cream">Weekly Combo</span><br>
           <span class="text-crimson">Specials</span>
         </h2>
-        <p class="text-cream/60 mt-4 max-w-xl">A different deal every day of the week — because lunch break shouldn't break the bank.</p>
+        <p class="text-cream/60 mt-4 max-w-xl">A different combo deal every day of the week — because lunch break shouldn't break the bank.</p>
       </div>
 
       <div class="grid lg:grid-cols-[1fr_1.3fr] gap-8 items-start">
@@ -1878,15 +2122,20 @@
           </div>
           <div class="mt-6">
             <h3 id="specialName" class="font-display text-2xl sm:text-3xl mb-2 fade-el">—</h3>
-            <p id="specialDesc" class="text-cream/60 text-sm mb-5 fade-el">—</p>
-            <div class="flex items-center justify-between mb-5 gap-3 flex-wrap">
-              <span id="specialPrice" class="font-mono text-3xl text-gold font-bold">—</span>
+            <div id="specialComboItems" class="combo-items mb-3 fade-el"></div>
+            <p id="specialDesc" class="text-cream/60 text-sm mb-3 fade-el">—</p>
+            <div class="flex items-center justify-between mb-4 gap-3 flex-wrap">
+              <div>
+                <span id="specialActualPrice" class="actual-price-strike text-cream/40">—</span>
+                <span id="specialPrice" class="font-mono text-3xl text-gold font-bold combo-price">—</span>
+                <span id="specialSavings" class="combo-savings-badge">—</span>
+              </div>
               <span class="inline-flex items-center gap-1.5 text-[11px] font-bold text-gold border border-gold/40 rounded-full px-3 py-1.5 shrink-0">
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8l-6.2 4.5 2.4-7.4L2 9.4h7.6z"/></svg>
                 TODAY ONLY
               </span>
             </div>
-            <button id="specialAddBtn" class="w-full bg-crimson text-white font-bold py-3.5 rounded-full hover:brightness-110 transition shadow-lg shadow-crimson/20">Add to Order</button>
+            <button id="specialAddBtn" class="w-full bg-crimson text-white font-bold py-3.5 rounded-full hover:brightness-110 transition shadow-lg shadow-crimson/20">Add Combo to Order</button>
           </div>
         </div>
 
@@ -2097,8 +2346,9 @@
     </div>
   </section>
 
-  <!-- FOOTER - BLIZZ CAFÉ -->
+  <!-- FOOTER - BLIZZ CAFÉ (background colour animation removed) -->
   <footer class="minimal-footer">
+    <!-- footer-glow removed to stop colour animation -->
     <div class="footer-container">
       <div class="footer-grid">
 
@@ -2165,7 +2415,6 @@
       </div>
     </div>
   </footer>
-
   <!-- CART SIDEBAR -->
   <div id="cartOverlay" class="hidden fixed inset-0 z-[100] bg-ink/70 backdrop-blur-sm"></div>
   <aside id="cartSidebar" class="fixed top-0 right-0 h-full w-full sm:max-w-md bg-char2 border-l border-gold/15 z-[101] translate-x-full transition-transform duration-300 thin-scroll overflow-y-auto">
@@ -2200,7 +2449,7 @@
             <span id="cartSubtotal" class="font-mono text-cream">Rs. 0.00</span>
           </div>
           <div class="flex justify-between text-sm">
-            <span class="text-cream/60">Service Fee (5%)</span>
+            <span class="text-cream/60" id="serviceFeeLabel">Service Fee (2%)</span>
             <span id="cartServiceFee" class="font-mono text-cream">Rs. 0.00</span>
           </div>
           <div class="flex justify-between text-lg font-semibold pt-2 border-t border-cream/10">
@@ -2751,23 +3000,72 @@
     }
 
     // ============================================================
-    // DAILY SPECIAL
+    // DAILY SPECIAL — UPDATED WITH COMBO OFFERS
     // ============================================================
     const DAILY_SPECIALS = {
-      Sunday: { name: 'Sunday Brick Stack', desc: 'Triple-stacked buttermilk pancakes, burnt-butter maple, seasonal fruit.',
-        price: 'Rs. 1900', img: 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?q=80&w=800&auto=format&fit=crop' },
-      Monday: { name: 'Monday Miso Mushroom Toast', desc: 'Charred sourdough, miso-glazed mushrooms, soft egg, chilli oil.',
-        price: 'Rs. 1700', img: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?q=80&w=800&auto=format&fit=crop' },
-      Tuesday: { name: 'Tuesday Shakshuka', desc: 'Slow-cooked tomato and capsicum, baked eggs, whipped feta, flatbread.',
-        price: 'Rs. 1800', img: 'https://images.unsplash.com/photo-1590412200988-a436970781fa?q=80&w=800&auto=format&fit=crop' },
-      Wednesday: { name: 'Wednesday Brick Benny', desc: 'Poached eggs, smoked ham hock, hollandaise, toasted brioche.',
-        price: 'Rs. 2000', img: 'https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=800&auto=format&fit=crop' },
-      Thursday: { name: 'Thursday Corn Fritters', desc: 'Charred corn, haloumi, avocado smash, chilli jam.', price: 'Rs. 1800',
-        img: 'https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?q=80&w=800&auto=format&fit=crop' },
-      Friday: { name: 'Friday Big Breakfast', desc: 'Eggs your way, bacon, chorizo, roasted tomato, sourdough.', price: 'Rs. 2200',
-        img: 'https://images.unsplash.com/photo-1533920379810-6bedac9e31f5?q=80&w=800&auto=format&fit=crop' },
-      Saturday: { name: 'Saturday Laneway Fry-Up', desc: 'The full works — eggs, bacon, sausage, beans, mushroom, toast.',
-        price: 'Rs. 2400', img: 'https://images.unsplash.com/photo-1533920379810-6bedac9e31f5?q=80&w=800&auto=format&fit=crop' },
+      Monday: { 
+        name: 'Fried Rice Energy Pack', 
+        desc: 'Combo Pack: Chicken Fried Rice + Chilled Iced Coffee',
+        items: ['Chicken Fried Rice', 'Chilled Iced Coffee'],
+        comboPrice: 950,
+        actualPrice: 1100,
+        savings: 150,
+        img: 'weeklys/monday.webp'
+      },
+      Tuesday: { 
+        name: 'Mid-Week Kottu Craving', 
+        desc: 'Combo Pack: Cheese & Chicken / Sausage Kottu + Iced Lemon Tea',
+        items: ['Cheese & Chicken / Sausage Kottu', 'Iced Lemon Tea'],
+        comboPrice: 1100,
+        actualPrice: 1250,
+        savings: 150,
+        img: 'weeklys/tuesday.webp'
+      },
+      Wednesday: { 
+        name: 'Middle East Twist', 
+        desc: 'Combo Pack: Chicken Shawarma (with French fries & salad) + Virgin Mojito',
+        items: ['Chicken Shawarma (with fries & salad)', 'Virgin Mojito'],
+        comboPrice: 1350,
+        actualPrice: 1550,
+        savings: 200,
+        img: 'weeklys/wednesday.webp'
+      },
+      Thursday: { 
+        name: 'Pasta & Shake Treat', 
+        desc: 'Combo Pack: Cheese & Chicken Pasta + Vanilla Milkshake',
+        items: ['Cheese & Chicken Pasta', 'Vanilla Milkshake'],
+        comboPrice: 1350,
+        actualPrice: 1550,
+        savings: 200,
+        img: 'weeklys/thursday.webp'
+      },
+      Friday: { 
+        name: 'Weekend Kickoff Burger', 
+        desc: 'Combo Pack: Supreme Beef Burger (with cheese & salad) + Bubble Milk Tea',
+        items: ['Supreme Beef Burger (with cheese & salad)', 'Bubble Milk Tea (Classic)'],
+        comboPrice: 1290,
+        actualPrice: 1500,
+        savings: 210,
+        img: 'weeklys/friday.webp'
+      },
+      Saturday: { 
+        name: 'Biriyani Feast', 
+        desc: 'Combo Pack: Chicken Biriyani (Aromatic basmati) + Traditional Falooda',
+        items: ['Chicken Biriyani (Aromatic basmati)', 'Traditional Falooda'],
+        comboPrice: 1490,
+        actualPrice: 1700,
+        savings: 210,
+        img: 'weeklys/saturday.webp'
+      },
+      Sunday: { 
+        name: 'The Supreme Cheese Finale', 
+        desc: 'Combo Pack: Supreme Cheese Kottu (Loaded with extra cheese) + Milo Dinosaur',
+        items: ['Supreme Cheese Kottu (Loaded with extra cheese)', 'Milo Dinosaur'],
+        comboPrice: 1850,
+        actualPrice: 2150,
+        savings: 300,
+        img: 'weeklys/sunday.webp'
+      },
     };
 
     let dailySpecialOverrides = {};
@@ -2781,7 +3079,10 @@
       return {
         name: override.name || defaults.name,
         desc: override.desc || defaults.desc,
-        price: override.price || defaults.price,
+        items: override.items || defaults.items,
+        comboPrice: override.comboPrice || defaults.comboPrice,
+        actualPrice: override.actualPrice || defaults.actualPrice,
+        savings: override.savings || defaults.savings,
         img: defaults.img,
       };
     }
@@ -2792,15 +3093,43 @@
       const today = getSpecialForDay(weekday);
 
       document.getElementById('specialName').textContent = today.name;
+      
+      // Render combo items
+      const comboItemsEl = document.getElementById('specialComboItems');
+      if (comboItemsEl) {
+        comboItemsEl.innerHTML = today.items.map(item => 
+          `<span class="combo-item">${item}</span>`
+        ).join('');
+      }
+      
       document.getElementById('specialDesc').textContent = today.desc;
-      document.getElementById('specialPrice').textContent = today.price;
+      
+      // Show actual price with strike-through and combo price
+      const actualPriceEl = document.getElementById('specialActualPrice');
+      const priceEl = document.getElementById('specialPrice');
+      const savingsEl = document.getElementById('specialSavings');
+      
+      if (actualPriceEl) {
+        actualPriceEl.textContent = `Rs. ${today.actualPrice.toFixed(0)}`;
+        actualPriceEl.style.display = 'inline';
+      }
+      priceEl.textContent = `Rs. ${today.comboPrice.toFixed(0)}`;
+      savingsEl.textContent = `Save Rs. ${today.savings.toFixed(0)}!`;
+      
       document.getElementById('specialImg').src = today.img;
       document.getElementById('specialImg').alt = today.name;
 
       const addBtn = document.getElementById('specialAddBtn');
       if (addBtn) {
-        const numericPrice = parseFloat(String(today.price).replace(/[^0-9.]/g, '')) || 0;
-        addBtn.onclick = () => addToCart({ name: today.name, desc: today.desc, price: numericPrice });
+        addBtn.onclick = () => addToCart({ 
+          name: `${today.name} (Combo)`, 
+          desc: today.desc,
+          price: today.comboPrice,
+          isCombo: true,
+          comboItems: today.items,
+          actualPrice: today.actualPrice,
+          savings: today.savings
+        });
       }
 
       const listEl = document.getElementById('weeklySpecialsList');
@@ -2814,9 +3143,13 @@
               <div class="special-content flex items-baseline gap-x-2 gap-y-0.5 flex-wrap">
                 <span class="font-semibold text-cream">${item.name}</span>
                 ${isToday ? '<span class="text-[10px] font-bold text-gold uppercase tracking-wide">· Today</span>' : ''}
-                <span class="text-cream/50 text-sm sm:truncate">${item.desc}</span>
+                <span class="combo-savings">Save Rs. ${item.savings.toFixed(0)}</span>
+                <span class="text-cream/50 text-sm w-full">${item.desc}</span>
               </div>
-              <span class="special-price font-mono text-gold font-bold">${item.price}</span>
+              <div class="special-price text-right">
+                <span class="actual-price-strike text-cream/40 text-xs block">Rs. ${item.actualPrice.toFixed(0)}</span>
+                <span class="font-mono text-gold font-bold">Rs. ${item.comboPrice.toFixed(0)}</span>
+              </div>
             </div>
           `;
         }).join('');
@@ -2860,35 +3193,34 @@
         .catch(err => console.error('Error loading favourites:', err));
     }
 
-function toggleFavourite(itemName) {
-  if (!currentUser) {
-    showOrderNotification('Sign in required', 'Please log in to save favourites.', '❤️', false);
-    openAuthModal();
-    return;
-  }
-  const idx = favourites.indexOf(itemName);
-  const userFavRef = db.collection('users').doc(currentUser.uid).collection('favourites');
-  
-  // Find the menu item to get its price and desc
-  const menuItem = MENU_ITEMS.find(item => item.name === itemName);
-  const price = menuItem ? menuItem.price : 0;
-  const desc = menuItem ? menuItem.desc : '';
-  
-  if (idx > -1) {
-    favourites.splice(idx, 1);
-    userFavRef.doc(itemName).delete().catch(err => console.error('Error removing favourite:', err));
-  } else {
-    favourites.push(itemName);
-    userFavRef.doc(itemName).set({ 
-      itemName, 
-      price: price,
-      desc: desc,
-      userId: currentUser.uid, 
-      addedAt: firebase.firestore.FieldValue.serverTimestamp() 
-    }).catch(err => console.error('Error adding favourite:', err));
-  }
-  updateFavouriteButtons();
-}
+    function toggleFavourite(itemName) {
+      if (!currentUser) {
+        showOrderNotification('Sign in required', 'Please log in to save favourites.', '❤️', false);
+        openAuthModal();
+        return;
+      }
+      const idx = favourites.indexOf(itemName);
+      const userFavRef = db.collection('users').doc(currentUser.uid).collection('favourites');
+      
+      const menuItem = MENU_ITEMS.find(item => item.name === itemName);
+      const price = menuItem ? menuItem.price : 0;
+      const desc = menuItem ? menuItem.desc : '';
+      
+      if (idx > -1) {
+        favourites.splice(idx, 1);
+        userFavRef.doc(itemName).delete().catch(err => console.error('Error removing favourite:', err));
+      } else {
+        favourites.push(itemName);
+        userFavRef.doc(itemName).set({ 
+          itemName, 
+          price: price,
+          desc: desc,
+          userId: currentUser.uid, 
+          addedAt: firebase.firestore.FieldValue.serverTimestamp() 
+        }).catch(err => console.error('Error adding favourite:', err));
+      }
+      updateFavouriteButtons();
+    }
 
     function updateFavouriteButtons() {
       document.querySelectorAll('.favourite-btn').forEach(btn => {
@@ -3059,7 +3391,7 @@ function toggleFavourite(itemName) {
     // ============================================================
     function addToCart(item) {
       let price = item.price;
-      if (activeDiscount) {
+      if (activeDiscount && !item.isCombo) {
         const discountItemName = activeDiscount.itemName || '';
         const isAllItems = discountItemName.toLowerCase() === 'all items' || discountItemName === '';
         const shouldApplyDiscount = isAllItems || 
@@ -3076,6 +3408,12 @@ function toggleFavourite(itemName) {
         existing.price = price;
         existing.orderType = item.orderType || 'pickup';
         existing.table = item.table || 'Pickup';
+        if (item.isCombo) {
+          existing.isCombo = true;
+          existing.comboItems = item.comboItems;
+          existing.actualPrice = item.actualPrice;
+          existing.savings = item.savings;
+        }
       } else {
         cart.push({ 
           name: item.name, 
@@ -3084,7 +3422,11 @@ function toggleFavourite(itemName) {
           desc: item.desc,
           originalPrice: item.price,
           orderType: item.orderType || 'pickup',
-          table: item.table || 'Pickup'
+          table: item.table || 'Pickup',
+          isCombo: item.isCombo || false,
+          comboItems: item.comboItems || [],
+          actualPrice: item.actualPrice || 0,
+          savings: item.savings || 0
         });
       }
       updateCartUI();
@@ -3113,9 +3455,22 @@ function toggleFavourite(itemName) {
     }
 
     function getCartTotal() {
+      // Check if any item is a combo
+      const hasCombo = cart.some(item => item.isCombo === true);
+      
+      // Service fee: 2% for combos, 5% for regular items
+      const serviceRate = hasCombo ? 0.02 : 0.05;
+      
       const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-      const serviceFee = subtotal * 0.05; // 5% service fee
-      return { subtotal, serviceFee, total: subtotal + serviceFee };
+      const serviceFee = subtotal * serviceRate;
+      
+      // Update label to show correct percentage
+      const label = document.getElementById('serviceFeeLabel');
+      if (label) {
+        label.textContent = `Service Fee (${Math.round(serviceRate * 100)}%)`;
+      }
+      
+      return { subtotal, serviceFee, total: subtotal + serviceFee, serviceRate };
     }
 
     function updateCartUI() {
@@ -3149,6 +3504,7 @@ function toggleFavourite(itemName) {
         <div class="cart-item flex items-center gap-3 p-3 rounded-xl bg-char border border-cream/5">
           <div class="flex-1">
             <p class="font-medium text-sm">${item.name}</p>
+            ${item.isCombo ? `<p class="text-cream/40 text-xs">Combo · Save Rs. ${item.savings.toFixed(0)}</p>` : ''}
             <p class="text-cream/50 text-xs">Rs. ${item.price.toFixed(0)}</p>
             <p class="text-cream/40 text-xs">${item.orderType === 'onshop' ? 'Table: ' + item.table : 'Pick Up'}</p>
           </div>
@@ -3255,7 +3611,7 @@ function toggleFavourite(itemName) {
 
       const timer = setTimeout(() => {
         if (notif.parentNode) notif.remove();
-      }, 3000); // 3 seconds auto-close
+      }, 3000);
 
       notif.querySelector('.notif-close').addEventListener('click', () => {
         clearTimeout(timer);
@@ -3291,7 +3647,10 @@ function toggleFavourite(itemName) {
         price: item.price,
         quantity: item.quantity,
         orderType: item.orderType || 'pickup',
-        table: item.table || 'Pickup'
+        table: item.table || 'Pickup',
+        isCombo: item.isCombo || false,
+        comboItems: item.comboItems || [],
+        savings: item.savings || 0
       }));
 
       const orderId = 'ORD-' + Date.now().toString().slice(-6) + '-' + Math.random().toString(36).substring(2, 6).toUpperCase();
@@ -3327,10 +3686,10 @@ function toggleFavourite(itemName) {
 📍 <b>Branch:</b> ${orderData.branch}
 
 <b>Items:</b>
-${orderItems.map(i => `  • ${i.name} x${i.quantity} = Rs. ${(i.price * i.quantity).toFixed(0)} (${i.orderType === 'onshop' ? 'Table: ' + i.table : 'Pick Up'})`).join('\n')}
+${orderItems.map(i => `  • ${i.name} x${i.quantity} = Rs. ${(i.price * i.quantity).toFixed(0)} (${i.orderType === 'onshop' ? 'Table: ' + i.table : 'Pick Up'})${i.isCombo ? ' [COMBO - Save Rs. ' + i.savings + ']' : ''}`).join('\n')}
 
 💰 <b>Subtotal:</b> Rs. ${totals.subtotal.toFixed(0)}
-💵 <b>Service Fee (5%):</b> Rs. ${totals.serviceFee.toFixed(0)}
+💵 <b>Service Fee (${Math.round(totals.serviceRate * 100)}%):</b> Rs. ${totals.serviceFee.toFixed(0)}
 🟡 <b>TOTAL:</b> Rs. ${totals.total.toFixed(0)}
 
 📦 <b>Type:</b> Pick Up Only
@@ -4007,13 +4366,46 @@ ${orderItems.map(i => `  • ${i.name} x${i.quantity} = Rs. ${(i.price * i.quant
     console.log('🔄 Initializing booking validation...');
     try { initBookingValidation(); } catch (err) { console.error('⚠️ Booking validation failed:', err); }
 
+    // ============================================================
+    // FOOTER — scroll reveal + back-to-top button
+    // ============================================================
+    try {
+      const footerCols = document.querySelectorAll('.footer-grid > div');
+      if ('IntersectionObserver' in window && footerCols.length) {
+        const footerObserver = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('in-view');
+              footerObserver.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.15 });
+        footerCols.forEach((col) => footerObserver.observe(col));
+      } else {
+        footerCols.forEach((col) => col.classList.add('in-view'));
+      }
+
+      const backToTopBtn = document.getElementById('backToTop');
+      if (backToTopBtn) {
+        window.addEventListener('scroll', () => {
+          backToTopBtn.classList.toggle('show', window.scrollY > 500);
+        }, { passive: true });
+        backToTopBtn.addEventListener('click', () => {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+      }
+      console.log('✅ Footer reveal + back-to-top ready');
+    } catch (err) {
+      console.error('⚠️ Footer enhancements failed:', err);
+    }
+
     console.log('✅ Blizz Café site initialized!');
-    console.log('✅ 6 most selling items added with updated prices (Rs.)');
-    console.log('✅ Service fee changed to 5%');
+    console.log('✅ Daily specials updated with combo offers!');
+    console.log('✅ Service fee: 2% for combos, 5% for regular items');
+    console.log('✅ Combo prices displayed with strike-through actual prices');
+    console.log('✅ Savings badges shown on each combo item');
     console.log('✅ Pickup / On Shop selector added with table list for On Shop');
     console.log('✅ All prices displayed in Rs.');
-    console.log('✅ Removed image carousels from menu items and replaced with single static images.');
-    console.log('✅ Countdown now updates live without resetting on refresh');
   </script>
 </body>
 </html>
