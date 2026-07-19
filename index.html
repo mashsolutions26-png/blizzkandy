@@ -1283,6 +1283,80 @@
     #authOverlay .glass-nav .close-btn:hover {
       color: #f4b93e;
     }
+    #phonePromptOverlay {
+      background: rgba(10, 11, 13, 0.85);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 1000;
+    }
+    #phonePromptOverlay .glass-nav {
+      background: rgba(26, 30, 36, 0.95);
+      border: 1px solid rgba(244, 185, 62, 0.2);
+      box-shadow: 0 30px 80px rgba(0,0,0,0.8);
+      border-radius: 28px;
+    }
+    #phonePromptOverlay .glass-nav input {
+      background: #0f1115;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 0.9rem 1.2rem;
+      color: #f5f0e6;
+      font-size: 0.95rem;
+      transition: border 0.3s ease;
+    }
+    #phonePromptOverlay .glass-nav input:focus {
+      border-color: #f4b93e;
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(244, 185, 62, 0.15);
+    }
+    #phonePromptOverlay .glass-nav input::placeholder {
+      color: #6a6a6f;
+    }
+    #phonePromptOverlay .glass-nav .submit-btn {
+      background: #f4b93e;
+      color: #0a0b0d;
+      font-weight: 700;
+      padding: 0.9rem;
+      border-radius: 9999px;
+      width: 100%;
+      transition: all 0.25s ease;
+      border: none;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    #phonePromptOverlay .glass-nav .submit-btn:hover {
+      transform: scale(1.02);
+      box-shadow: 0 0 30px rgba(244, 185, 62, 0.3);
+    }
+    #phonePromptOverlay .glass-nav .auth-error {
+      background: rgba(200, 16, 46, 0.12);
+      border: 1px solid rgba(200, 16, 46, 0.25);
+      border-radius: 12px;
+      padding: 0.75rem 1rem;
+      color: #f87171;
+      font-size: 0.85rem;
+      display: none;
+      margin-bottom: 0.75rem;
+    }
+    #phonePromptOverlay .glass-nav .auth-error.show {
+      display: block;
+    }
+    #phonePromptOverlay .glass-nav .close-btn {
+      position: absolute;
+      top: 1rem;
+      right: 1.25rem;
+      color: #6a6a6f;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: color 0.2s;
+      padding: 0.25rem;
+      line-height: 1;
+    }
+    #phonePromptOverlay .glass-nav .close-btn:hover {
+      color: #f4b93e;
+    }
     .apple-btn {
       background: #000;
       color: #fff;
@@ -2545,6 +2619,35 @@
     </div>
   </div>
 
+  <!-- PHONE NUMBER REQUIRED MODAL (shown before placing an order if the account has no saved phone number) -->
+  <div id="phonePromptOverlay" class="hidden fixed inset-0 z-[1000] flex items-center justify-center p-4">
+    <div class="glass-nav rounded-3xl p-8 relative max-h-[90vh] overflow-y-auto thin-scroll" style="max-width:400px;width:100%;">
+      <button id="phonePromptClose" class="close-btn" aria-label="Close">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+
+      <h3 class="font-display text-2xl mb-2">One more thing…</h3>
+      <p class="text-cream/60 text-sm mb-6">We need a phone number to confirm your order. Add it once and we'll remember it for next time.</p>
+
+      <div id="phonePromptError" class="auth-error"></div>
+
+      <form id="phonePromptForm" class="space-y-3">
+        <div class="flex gap-2">
+          <select id="opCountryCode" class="bg-ink border border-cream/15 rounded-xl px-2 py-3 text-sm focus:border-gold/60 w-24">
+            <option value="+94" selected>🇱🇰 +94</option>
+            <option value="+61">🇦🇺 +61</option>
+            <option value="+1">🇺🇸 +1</option>
+            <option value="+44">🇬🇧 +44</option>
+            <option value="+91">🇮🇳 +91</option>
+            <option value="+86">🇨🇳 +86</option>
+          </select>
+          <input required type="tel" id="opPhone" placeholder="Phone number" class="flex-1 bg-ink border border-cream/15 rounded-xl px-4 py-3 text-sm focus:border-gold/60">
+        </div>
+        <button type="submit" class="submit-btn">Continue to Order</button>
+      </form>
+    </div>
+  </div>
+
   <!-- JAVASCRIPT -->
   <script>
     // ============================================================
@@ -2641,6 +2744,7 @@
 
     let currentBranchKey = 'kandy';
     let currentUser = null;
+    let currentUserPhone = '';
     let ordersUnsubscribe = null;
     let cart = [];
     let cartUnsubscribe = null;
@@ -3809,6 +3913,11 @@
     // ============================================================
     // PLACE ORDER
     // ============================================================
+    // pendingOrderAfterPhone is set to true whenever we had to pause
+    // checkout to ask for a phone number, so we know to resume the
+    // order automatically once the phone prompt is submitted.
+    let pendingOrderAfterPhone = false;
+
     function placeOrder() {
       if (!currentUser) {
         showOrderNotification('Authentication Required', 'Please log in to place your order.', '🔐', false);
@@ -3821,6 +3930,18 @@
         return;
       }
 
+      if (!currentUserPhone) {
+        // No phone number saved on this account yet — ask for one before
+        // continuing. submitOrder() runs automatically once it's submitted.
+        pendingOrderAfterPhone = true;
+        openPhonePromptModal();
+        return;
+      }
+
+      submitOrder(currentUserPhone);
+    }
+
+    function submitOrder(phone) {
       // Everything below can throw synchronously (bad branch data, missing
       // fields, etc). Wrapping it means a bug here can never again leave the
       // UI stuck on "Placing Order..." with nothing happening — the user
@@ -3849,6 +3970,7 @@
           userId: currentUser.uid,
           userEmail: currentUser.email || 'guest@example.com',
           userName: currentUser.displayName || currentUser.email || 'Guest',
+          phone: phone,
           items: orderItems,
           subtotal: totals.subtotal,
           promoCode: (promoSystemEnabled && appliedPromo) ? appliedPromo.code : null,
@@ -3873,6 +3995,7 @@
 
 🆔 <b>Order ID:</b> ${orderId}
 👤 <b>Customer:</b> ${orderData.userName}
+📞 <b>Phone:</b> ${phone}
 📧 <b>Email:</b> ${orderData.userEmail}
 📍 <b>Branch:</b> ${orderData.branch}
 
@@ -3963,6 +4086,67 @@ ${orderItems.map(i => `  • ${i.name} x${i.quantity} = Rs. ${(i.price * i.quant
           );
         });
     }
+
+    // ============================================================
+    // PHONE PROMPT MODAL (asked once, before checkout, if the
+    // account has no saved phone number yet)
+    // ============================================================
+    const phonePromptOverlay = document.getElementById('phonePromptOverlay');
+    const phonePromptForm = document.getElementById('phonePromptForm');
+    const phonePromptError = document.getElementById('phonePromptError');
+    const phonePromptClose = document.getElementById('phonePromptClose');
+
+    function openPhonePromptModal() {
+      phonePromptError.textContent = '';
+      phonePromptError.classList.remove('show');
+      phonePromptOverlay.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closePhonePromptModal() {
+      phonePromptOverlay.classList.add('hidden');
+      document.body.style.overflow = '';
+      pendingOrderAfterPhone = false;
+    }
+
+    phonePromptClose.addEventListener('click', closePhonePromptModal);
+    phonePromptOverlay.addEventListener('click', (e) => {
+      if (e.target === phonePromptOverlay) closePhonePromptModal();
+    });
+
+    phonePromptForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      phonePromptError.textContent = '';
+      phonePromptError.classList.remove('show');
+
+      const countryCode = document.getElementById('opCountryCode').value;
+      const rawNumber = document.getElementById('opPhone').value.trim();
+
+      if (!rawNumber) {
+        phonePromptError.textContent = 'Please enter a phone number.';
+        phonePromptError.classList.add('show');
+        return;
+      }
+
+      const phone = countryCode + rawNumber;
+
+      // Save it to the account so we never have to ask again.
+      if (currentUser && db) {
+        db.collection('users').doc(currentUser.uid).set({ phone }, { merge: true })
+          .catch(err => console.error('Error saving phone number:', err));
+      }
+
+      currentUserPhone = phone;
+      phonePromptForm.reset();
+      document.getElementById('opCountryCode').value = countryCode;
+      phonePromptOverlay.classList.add('hidden');
+      document.body.style.overflow = '';
+
+      if (pendingOrderAfterPhone) {
+        pendingOrderAfterPhone = false;
+        submitOrder(phone);
+      }
+    });
 
     // ============================================================
     // CART SIDEBAR CONTROLS
@@ -4241,6 +4425,13 @@ ${orderItems.map(i => `  • ${i.name} x${i.quantity} = Rs. ${(i.price * i.quant
           loadCartFromFirestore();
           loadFavouritesFromFirestore();
 
+          currentUserPhone = '';
+          if (db) {
+            db.collection('users').doc(user.uid).get()
+              .then(doc => { currentUserPhone = (doc.exists && doc.data().phone) ? doc.data().phone : ''; })
+              .catch(err => console.error('Error loading saved phone number:', err));
+          }
+
           if (!authOverlay.classList.contains('hidden')) {
             closeAuthModal();
           }
@@ -4258,6 +4449,7 @@ ${orderItems.map(i => `  • ${i.name} x${i.quantity} = Rs. ${(i.price * i.quant
           loadCartFromLocalStorage();
           favourites = [];
           updateFavouriteButtons();
+          currentUserPhone = '';
         }
       });
     } else {
