@@ -4702,6 +4702,13 @@ ${orderItems.map(i => `  • ${i.name} x${i.quantity} = Rs. ${(i.price * i.quant
     });
 
     document.getElementById('bookingForm').addEventListener('submit', function(e) {
+      // MUST prevent the default form submission immediately. The <form>
+      // has no action/method attributes, so without this, a successful
+      // booking (the normal path, where neither error branch below runs)
+      // falls through to the browser's default GET submit — which reloads
+      // the whole page and was why "Book a Table" appeared to refresh the site.
+      e.preventDefault();
+
       const bookingDate = document.getElementById('bookingDate');
       const bookingTime = document.getElementById('bookingTime');
       const bookingError = document.getElementById('bookingError');
@@ -4710,7 +4717,6 @@ ${orderItems.map(i => `  • ${i.name} x${i.quantity} = Rs. ${(i.price * i.quant
       const selectedTime = bookingTime.value;
       
       if (!selectedDate || !selectedTime) {
-        e.preventDefault();
         bookingError.textContent = '❌ Please select both a date and time.';
         bookingError.classList.add('show');
         return;
