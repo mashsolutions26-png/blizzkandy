@@ -3849,14 +3849,15 @@
         .replace(/>/g, '&gt;');
     }
 
-    function sendTelegramNotification(message) {
+    function sendTelegramNotification(message, context = '') {
       const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
       const payload = {
         chat_id: TELEGRAM_CHAT_ID,
         text: message,
         parse_mode: 'HTML'
       };
-      fetch(url, {
+      const tag = context ? ` [${context}]` : '';
+      return fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -3867,12 +3868,17 @@
           // parse_mode HTML or wrong chat id — fetch() alone never treats
           // that as an error, so without this check failures went unnoticed.
           if (!ok || data.ok === false) {
-            console.error('❌ Telegram API rejected the message:', status, data);
+            console.error(`❌ Telegram API rejected the message${tag}:`, status, data);
+            return { success: false, status, data };
           } else {
-            console.log('✅ Telegram message sent');
+            console.log(`✅ Telegram message sent${tag}`);
+            return { success: true, status, data };
           }
         })
-        .catch(err => console.error('❌ Telegram network error:', err));
+        .catch(err => {
+          console.error(`❌ Telegram network error${tag}:`, err);
+          return { success: false, error: err.message };
+        });
     }
 
     function sendBookingTelegram(bookingData) {
@@ -3904,7 +3910,7 @@
 📅 <b>Created:</b> ${bookingData.createdAt}
 
 🔔 <i>Please prepare the table for this booking.</i>`;
-      sendTelegramNotification(message);
+      return sendTelegramNotification(message, `booking ${bookingData.bookingId}`);
     }
 
     // ============================================================
@@ -4782,7 +4788,17 @@ ${orderItems.map(i => `  • ${escapeTelegramHtml(i.name)} x${i.quantity} = Rs. 
       // Send the Telegram alert immediately, independent of the Firestore
       // write below — so staff always get notified even if the save fails.
       try {
-        sendBookingTelegram(bookingData);
+        sendBookingTelegram(bookingData).then(result => {
+          if (!result.success) {
+            const reason = (result.data && result.data.description) || result.error || 'Unknown error';
+            showOrderNotification(
+              '⚠️ Booking Saved, But Telegram Alert Failed',
+              `Your table booking was recorded, but staff were NOT notified on Telegram (${reason}). Please call to confirm your table.`,
+              '⚠️',
+              false
+            );
+          }
+        });
       } catch (tgErr) {
         console.error('❌ Booking Telegram send threw synchronously:', tgErr);
       }
