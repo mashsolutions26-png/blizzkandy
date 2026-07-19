@@ -4012,6 +4012,7 @@
           total: totals.total,
           status: 'Confirmed',
           orderType: 'Pickup',
+          type: 'PickUp',
           paymentMethod: 'Online',
           branch: branch.name,
           branchAddress: branch.address,
@@ -4026,21 +4027,21 @@
         telegramMessage = `
 🛎️ <b>New Order at Blizz Café!</b>
 
-🆔 <b>Order ID:</b> ${orderId}
-👤 <b>Customer:</b> ${orderData.userName}
-📞 <b>Phone:</b> ${phone}
-📧 <b>Email:</b> ${orderData.userEmail}
-📍 <b>Branch:</b> ${orderData.branch}
+🆔 <b>Order ID:</b> ${escapeTelegramHtml(orderId)}
+👤 <b>Customer:</b> ${escapeTelegramHtml(orderData.userName)}
+📞 <b>Phone:</b> ${escapeTelegramHtml(phone)}
+📧 <b>Email:</b> ${escapeTelegramHtml(orderData.userEmail)}
+📍 <b>Branch:</b> ${escapeTelegramHtml(orderData.branch)}
 
 <b>Items:</b>
-${orderItems.map(i => `  • ${i.name} x${i.quantity} = Rs. ${(i.price * i.quantity).toFixed(0)} (${i.orderType === 'onshop' ? 'Table: ' + i.table : 'Pick Up'})${i.isCombo ? ' [COMBO - Save Rs. ' + i.savings + ']' : ''}`).join('\n')}
+${orderItems.map(i => `  • ${escapeTelegramHtml(i.name)} x${i.quantity} = Rs. ${(i.price * i.quantity).toFixed(0)} (${i.orderType === 'onshop' ? 'Table: ' + escapeTelegramHtml(i.table) : 'Pick Up'})${i.isCombo ? ' [COMBO - Save Rs. ' + i.savings + ']' : ''}`).join('\n')}
 
-💰 <b>Subtotal:</b> Rs. ${totals.subtotal.toFixed(0)}${orderData.promoCode ? `\n🎟️ <b>Promo (${orderData.promoCode}):</b> - Rs. ${totals.discount.toFixed(0)}` : ''}
+💰 <b>Subtotal:</b> Rs. ${totals.subtotal.toFixed(0)}${orderData.promoCode ? `\n🎟️ <b>Promo (${escapeTelegramHtml(orderData.promoCode)}):</b> - Rs. ${totals.discount.toFixed(0)}` : ''}
 💵 <b>Service Fee (${Math.round(totals.serviceRate * 100)}%):</b> Rs. ${totals.serviceFee.toFixed(0)}
 🟡 <b>TOTAL:</b> Rs. ${totals.total.toFixed(0)}
 
 📦 <b>Type:</b> Pick Up Only
-📍 <b>Address:</b> ${branch.address}
+📍 <b>Address:</b> ${escapeTelegramHtml(branch.address)}
 
 🔔 <i>Please prepare this order for pickup.</i>
       `;
