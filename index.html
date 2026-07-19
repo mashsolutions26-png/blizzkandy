@@ -3838,6 +3838,17 @@
     // ============================================================
     // TELEGRAM NOTIFICATION
     // ============================================================
+    // Escapes HTML special characters so free-text user input (name, phone,
+    // special requests, etc.) can never break Telegram's HTML parse_mode.
+    // Without this, a customer typing "&", "<" or ">" in a request field
+    // would cause Telegram to silently reject the whole message.
+    function escapeTelegramHtml(value) {
+      return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    }
+
     function sendTelegramNotification(message) {
       const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
       const payload = {
@@ -3849,28 +3860,50 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
-      }).catch(err => console.error('Telegram error:', err));
+      })
+        .then(res => res.json().then(data => ({ status: res.status, ok: res.ok, data })))
+        .then(({ ok, status, data }) => {
+          // Telegram returns HTTP 200 with ok:false on things like bad
+          // parse_mode HTML or wrong chat id — fetch() alone never treats
+          // that as an error, so without this check failures went unnoticed.
+          if (!ok || data.ok === false) {
+            console.error('❌ Telegram API rejected the message:', status, data);
+          } else {
+            console.log('✅ Telegram message sent');
+          }
+        })
+        .catch(err => console.error('❌ Telegram network error:', err));
     }
 
     function sendBookingTelegram(bookingData) {
-      const message = `📢 NEW BOOKING ALERT! 📢
+      const n = escapeTelegramHtml(bookingData.name);
+      const ph = escapeTelegramHtml(bookingData.phone);
+      const specialReq = escapeTelegramHtml(bookingData.specialRequest || 'None');
+      const addlReq = escapeTelegramHtml(bookingData.additionalRequests || 'None');
+      const seating = escapeTelegramHtml(bookingData.seating || 'Not specified');
+      const table = escapeTelegramHtml(bookingData.table || 'Any');
+      const guests = escapeTelegramHtml(bookingData.guests);
 
-📅 New Table Booking!
+      const message = `🆕 <b>NEW TABLE BOOKING ORDER</b> 🆕
 
-👤 Name: ${bookingData.name}
-📞 Phone: ${bookingData.phone}
-📆 Date: ${bookingData.date}
-🕐 Time: ${bookingData.time}
-👥 Guests: ${bookingData.guests}
-🪑 Seating: ${bookingData.seating || 'Not specified'}
-🍽️ Table: ${bookingData.table || 'Any'}
-📝 Special Request: ${bookingData.specialRequest || 'None'}
-📋 Additional Requests: ${bookingData.additionalRequests || 'None'}
-🆔 Booking ID: ${bookingData.bookingId}
-👤 Guest: ${bookingData.guestType || 'Guest'}
+📅 <b>A new table booking has just been placed!</b>
 
-⏱️ Status: Pending
-📅 Created: ${bookingData.createdAt}`;
+👤 <b>Name:</b> ${n}
+📞 <b>Phone:</b> ${ph}
+📆 <b>Date:</b> ${bookingData.date}
+🕐 <b>Time:</b> ${bookingData.time}
+👥 <b>Guests:</b> ${guests}
+🪑 <b>Seating:</b> ${seating}
+🍽️ <b>Table:</b> ${table}
+📝 <b>Special Request:</b> ${specialReq}
+📋 <b>Additional Requests:</b> ${addlReq}
+🆔 <b>Booking ID:</b> ${bookingData.bookingId}
+👤 <b>Guest Type:</b> ${escapeTelegramHtml(bookingData.guestType || 'Guest')}
+
+⏱️ <b>Status:</b> Pending
+📅 <b>Created:</b> ${bookingData.createdAt}
+
+🔔 <i>Please prepare the table for this booking.</i>`;
       sendTelegramNotification(message);
     }
 
