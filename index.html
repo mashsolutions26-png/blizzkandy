@@ -3821,45 +3821,54 @@
         return;
       }
 
-      const totals = getCartTotal();
-      const orderItems = cart.map(item => ({
-        name: item.name,
-        price: item.price,
-        quantity: item.quantity,
-        orderType: item.orderType || 'pickup',
-        table: item.table || 'Pickup',
-        isCombo: item.isCombo || false,
-        comboItems: item.comboItems || [],
-        savings: item.savings || 0
-      }));
+      // Everything below can throw synchronously (bad branch data, missing
+      // fields, etc). Wrapping it means a bug here can never again leave the
+      // UI stuck on "Placing Order..." with nothing happening — the user
+      // always gets a real error message, and we log full details to the
+      // console for debugging.
+      let totals, orderItems, orderId, orderData, telegramMessage;
+      try {
+        totals = getCartTotal();
+        orderItems = cart.map(item => ({
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+          orderType: item.orderType || 'pickup',
+          table: item.table || 'Pickup',
+          isCombo: item.isCombo || false,
+          comboItems: item.comboItems || [],
+          savings: item.savings || 0
+        }));
 
-      const orderId = 'ORD-' + Date.now().toString().slice(-6) + '-' + Math.random().toString(36).substring(2, 6).toUpperCase();
+        orderId = 'ORD-' + Date.now().toString().slice(-6) + '-' + Math.random().toString(36).substring(2, 6).toUpperCase();
 
-      const orderData = {
-        orderId: orderId,
-        userId: currentUser.uid,
-        userEmail: currentUser.email || 'guest@example.com',
-        userName: currentUser.displayName || currentUser.email || 'Guest',
-        items: orderItems,
-        subtotal: totals.subtotal,
-        promoCode: (promoSystemEnabled && appliedPromo) ? appliedPromo.code : null,
-        discount: totals.discount || 0,
-        serviceFee: totals.serviceFee,
-        total: totals.total,
-        status: 'Confirmed',
-        orderType: 'Pickup',
-        paymentMethod: 'Online',
-        branch: BRANCHES[currentBranchKey].name,
-        branchAddress: BRANCHES[currentBranchKey].address,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-        statusHistory: [{
+        const branch = BRANCHES[currentBranchKey] || { name: 'Blizz Café', address: '' };
+
+        orderData = {
+          orderId: orderId,
+          userId: currentUser.uid,
+          userEmail: currentUser.email || 'guest@example.com',
+          userName: currentUser.displayName || currentUser.email || 'Guest',
+          items: orderItems,
+          subtotal: totals.subtotal,
+          promoCode: (promoSystemEnabled && appliedPromo) ? appliedPromo.code : null,
+          discount: totals.discount || 0,
+          serviceFee: totals.serviceFee,
+          total: totals.total,
           status: 'Confirmed',
-          timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        }]
-      };
+          orderType: 'Pickup',
+          paymentMethod: 'Online',
+          branch: branch.name,
+          branchAddress: branch.address,
+          createdAt: (window.firebase && firebase.firestore) ? firebase.firestore.FieldValue.serverTimestamp() : new Date(),
+          updatedAt: (window.firebase && firebase.firestore) ? firebase.firestore.FieldValue.serverTimestamp() : new Date(),
+          statusHistory: [{
+            status: 'Confirmed',
+            timestamp: (window.firebase && firebase.firestore) ? firebase.firestore.FieldValue.serverTimestamp() : new Date()
+          }]
+        };
 
-      const telegramMessage = `
+        telegramMessage = `
 🛎️ <b>New Order at Blizz Café!</b>
 
 🆔 <b>Order ID:</b> ${orderId}
@@ -3875,10 +3884,20 @@ ${orderItems.map(i => `  • ${i.name} x${i.quantity} = Rs. ${(i.price * i.quant
 🟡 <b>TOTAL:</b> Rs. ${totals.total.toFixed(0)}
 
 📦 <b>Type:</b> Pick Up Only
-📍 <b>Address:</b> ${BRANCHES[currentBranchKey].address}
+📍 <b>Address:</b> ${branch.address}
 
 🔔 <i>Please prepare this order for pickup.</i>
       `;
+      } catch (buildErr) {
+        console.error('❌ Order build error (before saving/sending anything):', buildErr);
+        showOrderNotification(
+          '⚠️ Something Went Wrong',
+          `Could not prepare your order (${buildErr.message}). Please try again or contact staff.`,
+          '⚠️',
+          false
+        );
+        return;
+      }
 
       function finishCartAfterOrder() {
         cart = [];
@@ -3886,11 +3905,32 @@ ${orderItems.map(i => `  • ${i.name} x${i.quantity} = Rs. ${(i.price * i.quant
         localStorage.removeItem('blizzCafePromoCode');
         updateCartUI();
         saveCartToLocalStorage();
-        saveCartToFirestore();
+        try { saveCartToFirestore(); } catch (e) { console.error('⚠️ saveCartToFirestore failed:', e); }
         closeCart();
       }
 
       showOrderNotification('Placing Order...', 'Please wait while we process your order.', '⏳', true);
+
+      // Send the Telegram alert immediately and independently of Firestore.
+      // This guarantees the kitchen is notified even if the database write
+      // fails for any reason (rules, network, offline, etc).
+      try {
+        sendTelegramNotification(telegramMessage);
+      } catch (tgErr) {
+        console.error('❌ Telegram send threw synchronously:', tgErr);
+      }
+
+      if (!db) {
+        console.error('❌ Firestore (db) is not available — Firebase failed to initialise. Order was sent to Telegram but NOT saved, so it will not appear in the admin panel or your account.');
+        finishCartAfterOrder();
+        showOrderNotification(
+          '⚠️ Order Sent, But Not Saved',
+          `We notified the kitchen directly, but the order could not be saved to the system. Please tell staff your order ID: ${orderId}.`,
+          '⚠️',
+          false
+        );
+        return;
+      }
 
       db.collection('orders').add(orderData)
         .then((docRef) => {
@@ -3902,7 +3942,6 @@ ${orderItems.map(i => `  • ${i.name} x${i.quantity} = Rs. ${(i.price * i.quant
             '✅',
             true
           );
-          sendTelegramNotification(telegramMessage);
           document.getElementById('cartContent').classList.add('hidden');
           document.getElementById('orderSuccess').classList.remove('hidden');
           setTimeout(() => {
@@ -3911,7 +3950,7 @@ ${orderItems.map(i => `  • ${i.name} x${i.quantity} = Rs. ${(i.price * i.quant
           }, 5000);
         })
         .catch((err) => {
-          console.error('❌ Firestore save error:', err);
+          console.error('❌ Firestore save error:', err.code || '', err.message || err);
           sendTelegramNotification(
             `⚠️ <b>ORDER NOT SAVED TO SYSTEM</b> (Firestore error: ${err.code || err.message})\n` + telegramMessage
           );
@@ -4508,18 +4547,29 @@ ${orderItems.map(i => `  • ${i.name} x${i.quantity} = Rs. ${(i.price * i.quant
         createdAt, userEmail, userName, seatingPreference
       };
 
-      db.collection('bookings').add({
-        uid, name, email: userEmail, phone, date: dateInput.value, time: timeInput.value,
-        guests: guestsValue, seating, table, specialRequest, additionalRequests, bookingId,
-        branch: currentBranchKey, guestType: currentUser ? 'Logged In User' : 'Guest',
-        seatingPreference: seatingPreference,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-      }).then(() => {
+      // Send the Telegram alert immediately, independent of the Firestore
+      // write below — so staff always get notified even if the save fails.
+      try {
         sendBookingTelegram(bookingData);
-      }).catch((err) => {
-        console.error('Booking error:', err);
-        sendBookingTelegram(bookingData);
-      });
+      } catch (tgErr) {
+        console.error('❌ Booking Telegram send threw synchronously:', tgErr);
+      }
+
+      if (!db) {
+        console.error('❌ Firestore (db) is not available — booking was sent to Telegram but NOT saved, so it will not appear in the admin panel or your account.');
+      } else {
+        db.collection('bookings').add({
+          uid, name, email: userEmail, phone, date: dateInput.value, time: timeInput.value,
+          guests: guestsValue, seating, table, specialRequest, additionalRequests, bookingId,
+          branch: currentBranchKey, guestType: currentUser ? 'Logged In User' : 'Guest',
+          seatingPreference: seatingPreference,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        }).then(() => {
+          console.log('✅ Booking saved to Firestore');
+        }).catch((err) => {
+          console.error('❌ Booking Firestore save error:', err.code || '', err.message || err);
+        });
+      }
 
       document.getElementById('bookingSuccess').classList.remove('hidden');
       setTimeout(() => {
